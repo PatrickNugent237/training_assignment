@@ -28,6 +28,7 @@ const Login = () => {
             data: form.serialize(),
             success(data) {
                 setResult(data);
+                console.log(data);
                 setAuthenticated(true);
                 sessionStorage.setItem("authenticated", true);
                 navigate("/dashboard");
