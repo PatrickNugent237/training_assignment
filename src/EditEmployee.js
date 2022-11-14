@@ -19,6 +19,7 @@ const EditEmployee = () => {
   const [result, setResult] = useState("");
   const [authenticated, setAuthenticated] = useState(
     sessionStorage.getItem("authenticated")|| false);
+  const [jwt, setJWT] = useState("");
     
   const location = useLocation();
   const [employeeData, setEmployeeData] = useState(location.state.employeeData);
@@ -106,8 +107,10 @@ const EditEmployee = () => {
         }),
         success(data) {
           setResult(data);
-          //setAuthenticated(true);
-          //sessionStorage.setItem("authenticated", true);
+          setAuthenticated(true);
+          setJWT(data);
+          sessionStorage.setItem("authenticated", true);
+          sessionStorage.setItem("jwt", data);
           navigate("/dashboard");
         },
     });

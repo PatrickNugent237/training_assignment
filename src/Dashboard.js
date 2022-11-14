@@ -8,27 +8,10 @@ const Dashboard = () => {
   //const [authenticated, setAuthenticated] = useState(null);
   const [authenticated, setAuthenticated] = useState(
     sessionStorage.getItem("authenticated"));
+  const [jwt] = useState(
+    sessionStorage.getItem("jwt") || "");
   const [result, setResult] = useState([]);
   const navigate = useNavigate();
-
-  /*const handleEditOption = (e) => {
-    e.preventDefault();
-
-    if (state.button === "edit") {
-      console.log("Button 1 clicked!");
-    }
-    if (state.button === "delete") {
-      const employeeID = $(e.target);
-      $.ajax({
-        type: "DELETE",
-        url: "http://localhost:8000/api/deleteEmployee.php",
-        data: employeeID.serialize(),
-        success(data) {
-
-        },
-    });
-    }
-  };*/
 
   const handleDelete = (empID) => {
     //e.preventDefault();
@@ -38,10 +21,14 @@ const Dashboard = () => {
 
     console.log("body: " + JSON.stringify({ employeeID: empID }));
 
+    //console.log("jwt: " + JSON.stringify({ jwt: jwt }));
+
+    console.log("jwt: " + jwt.toString());
+
       $.ajax({
         type: "DELETE",
         url: "http://localhost:8000/api/Employees.php/" + empID,
-        data: JSON.stringify({ employeeID: empID }),
+        data: JSON.stringify({ employeeID: empID, jwt: JSON.parse(jwt) }),
         success(data) {
           console.log("employee deleted successfully with response: " + data)
         },

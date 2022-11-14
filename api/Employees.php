@@ -22,6 +22,47 @@ function bin_to_uuid($bin){
   return join("-", unpack("H8time_low/H4time_mid/H4time_hi/H4clock_seq_hi/H12clock_seq_low", $bin));
 }
 
+//Encodes a base 64 url
+//Source: https://roytuts.com/how-to-generate-and-validate-jwt-using-php-without-using-third-party-api/
+function base64url_encode($str) {
+  return rtrim(strtr(base64_encode($str), '+/', '-_'), '=');
+}
+
+//Checks whether a JWT is valid
+//Source: https://roytuts.com/how-to-generate-and-validate-jwt-using-php-without-using-third-party-api/
+function is_jwt_valid($jwt, $secret = 'mVm3CSjaT2Q3Y0aqK0qcZVQ1lDFKa9HDQoEepZbVLzoav25ugriBy7kId9FkOMI') {
+	// split the jwt
+	$tokenParts = explode('.', $jwt);
+	$header = base64_decode($tokenParts[0]);
+	$payload = base64_decode($tokenParts[1]);
+	$signature_provided = $tokenParts[2];
+
+	// check the expiration time - note this will cause an error if there is no 'exp' claim in the jwt
+	$expiration = json_decode($payload)->exp;
+	$is_token_expired = ($expiration - time()) < 0;
+
+	// build a signature based on the header and payload using the secret
+	$base64_url_header = base64url_encode($header);
+	$base64_url_payload = base64url_encode($payload);
+	$signature = hash_hmac('SHA256', $base64_url_header . "." . $base64_url_payload, $secret, true);
+	$base64_url_signature = base64url_encode($signature);
+
+	// verify it matches the signature provided in the jwt
+	$is_signature_valid = ($base64_url_signature === $signature_provided);
+	
+	/*if ($is_token_expired || !$is_signature_valid) {
+		return FALSE;
+	} else {
+		return TRUE;
+	}*/
+
+  if (!$is_signature_valid) {
+		return FALSE;
+	} else {
+		return TRUE;
+	}
+}
+
 switch($_SERVER['REQUEST_METHOD'])
 {
   case 'GET':
@@ -122,10 +163,17 @@ switch($_SERVER['REQUEST_METHOD'])
       die(mysqli_error($con));
     }
     else {  
-      http_response_code(201);
+      if(is_jwt_valid($data->jwt))
+      {
+        http_response_code(200);
+      }
+      else
+      {
+        //http_response_code(401);
+        echo json_encode($data->jwt);
+      }
     }
 
-break;
     break;
   case 'PUT': 
     $employeeID = uuid_to_bin($data->employeeID);
@@ -170,7 +218,16 @@ break;
       die(mysqli_error($con));
     }
     else{  
-      http_response_code(200);
+      if(is_jwt_valid($data->jwt))
+      {
+        http_response_code(200);
+        echo json_encode("JWT validated: " . $data->jwt);
+      }
+      else
+      {
+        http_response_code(401);
+        echo json_encode($data->jwt);
+      }
     }
 
     break;

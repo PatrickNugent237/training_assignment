@@ -8,7 +8,9 @@ const Login = () => {
     const [password, setPassword] = useState("");
     const [result, setResult] = useState("");
     const [authenticated, setAuthenticated] = useState(
-        sessionStorage.getItem("authenticated")|| false);
+        sessionStorage.getItem("authenticated") || false);
+    const [jwt, setJWT] = useState(
+        sessionStorage.getItem("jwt") || "");
     const navigate = useNavigate();
 
     const handleUsernameChange = (e) => {
@@ -30,7 +32,9 @@ const Login = () => {
                 setResult(data);
                 console.log(data);
                 setAuthenticated(true);
+                setJWT(data);
                 sessionStorage.setItem("authenticated", true);
+                sessionStorage.setItem("jwt", data);
                 navigate("/dashboard");
             },
         });

@@ -11,7 +11,8 @@ const EditEmployee = () => {
   const [result, setResult] = useState("");
   const [authenticated, setAuthenticated] = useState(
     sessionStorage.getItem("authenticated")|| false);
-    
+  const [jwt] = useState(
+    sessionStorage.getItem("jwt") || "");
   const [employeeData, setEmployeeData] = useState({
     firstName: "",
     lastName: "",
@@ -101,7 +102,7 @@ const EditEmployee = () => {
           firstName: employeeData.firstName, lastName: employeeData.lastName,
           dob: employeeData.dob, email: employeeData.email, 
           skillLevelID: skillLevelID, active: active,
-          age: employeeData.age
+          age: employeeData.age, jwt: jwt
         }),
         success(data) {
           setResult(data);

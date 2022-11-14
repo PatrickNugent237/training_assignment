@@ -10,7 +10,42 @@ $dotenv->load();
 // Retrive env variable
 $secret = $_ENV['JWT_SECRET'] ?? '';*/
 
-function generate_jwt($headers, $payload, $secret = 'secret') {
+//Checks whether a JWT is valid
+//Source: https://roytuts.com/how-to-generate-and-validate-jwt-using-php-without-using-third-party-api/
+function is_jwt_valid($jwt, $secret = 'mVm3CSjaT2Q3Y0aqK0qcZVQ1lDFKa9HDQoEepZbVLzoav25ugriBy7kId9FkOMI') {
+	// split the jwt
+	$tokenParts = explode('.', $jwt);
+	$header = base64_decode($tokenParts[0]);
+	$payload = base64_decode($tokenParts[1]);
+	$signature_provided = $tokenParts[2];
+
+	// check the expiration time - note this will cause an error if there is no 'exp' claim in the jwt
+	$expiration = json_decode($payload)->exp;
+	$is_token_expired = ($expiration - time()) < 0;
+
+	// build a signature based on the header and payload using the secret
+	$base64_url_header = base64url_encode($header);
+	$base64_url_payload = base64url_encode($payload);
+	$signature = hash_hmac('SHA256', $base64_url_header . "." . $base64_url_payload, $secret, true);
+	$base64_url_signature = base64url_encode($signature);
+
+	// verify it matches the signature provided in the jwt
+	$is_signature_valid = ($base64_url_signature === $signature_provided);
+	
+	/*if ($is_token_expired || !$is_signature_valid) {
+		return FALSE;
+	} else {
+		return TRUE;
+	}*/
+
+  if (!$is_signature_valid) {
+		return FALSE;
+	} else {
+		return TRUE;
+	}
+}
+
+function generate_jwt($headers, $payload, $secret = 'mVm3CSjaT2Q3Y0aqK0qcZVQ1lDFKa9HDQoEepZbVLzoav25ugriBy7kId9FkOMI') {
 	$headers_encoded = base64url_encode(json_encode($headers));
 	
 	$payload_encoded = base64url_encode(json_encode($payload));
@@ -55,13 +90,26 @@ if($foundUser != NULL)
 
   if (password_verify($password, $hash)) {
     //echo "Logged in successfully";
-    $secret = 'mVm3CSjaT2Q3Y0aqK0qcZVQ1lDFKa9HDQoEepZbVLzoav25ugriBy7kId9FkOMI';
+    /*$secret = 'mVm3CSjaT2Q3Y0aqK0qcZVQ1lDFKa9HDQoEepZbVLzoav25ugriBy7kId9FkOMI';
     $headers = array('alg'=>'HS256','typ'=>'JWT');
-    $payload = array('name'=>$username, 'exp'=>(time() + 60));
+    $payload = array('name'=>$username, 
+      'exp'=>(time() + 60),
+      'iss'=> "localhost",
+      'iat'=> time()
+    );*/
 
+    $headers = array('alg'=>'HS256','typ'=>'JWT');
+    $payload = array('sub'=>'1234567890','name'=>'John Doe', 'admin'=>true, 'exp'=>(time() + 60));
     $jwt = generate_jwt($headers, $payload);
 
-    echo json_encode($jwt);
+    if(is_jwt_valid($jwt))
+    {
+      echo json_encode($jwt);
+    }
+    else
+    {
+      echo json_encode("Invalid token generated");
+    }
 
     http_response_code(200);
   } 
