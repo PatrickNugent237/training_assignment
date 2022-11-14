@@ -19,8 +19,8 @@ const EditEmployee = () => {
   const [result, setResult] = useState("");
   const [authenticated, setAuthenticated] = useState(
     sessionStorage.getItem("authenticated")|| false);
-  const [jwt, setJWT] = useState("");
-    
+  const [jwt] = useState(
+    sessionStorage.getItem("jwt") || "");
   const location = useLocation();
   const [employeeData, setEmployeeData] = useState(location.state.employeeData);
   const navigate = useNavigate();
@@ -103,14 +103,11 @@ const EditEmployee = () => {
           firstName: employeeData.firstName, lastName: employeeData.lastName,
           dob: employeeData.dob, email: employeeData.email, 
           skillLevelID: skillLevelID, active: active,
-          age: employeeData.age
+          age: employeeData.age, jwt: JSON.parse(jwt)
         }),
         success(data) {
           setResult(data);
-          setAuthenticated(true);
-          setJWT(data);
-          sessionStorage.setItem("authenticated", true);
-          sessionStorage.setItem("jwt", data);
+          //setAuthenticated(true);
           navigate("/dashboard");
         },
     });

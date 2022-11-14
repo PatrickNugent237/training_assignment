@@ -102,7 +102,7 @@ const EditEmployee = () => {
           firstName: employeeData.firstName, lastName: employeeData.lastName,
           dob: employeeData.dob, email: employeeData.email, 
           skillLevelID: skillLevelID, active: active,
-          age: employeeData.age, jwt: jwt
+          age: employeeData.age, jwt: JSON.parse(jwt)
         }),
         success(data) {
           setResult(data);

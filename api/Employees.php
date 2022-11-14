@@ -66,168 +66,183 @@ function is_jwt_valid($jwt, $secret = 'mVm3CSjaT2Q3Y0aqK0qcZVQ1lDFKa9HDQoEepZbVL
 switch($_SERVER['REQUEST_METHOD'])
 {
   case 'GET':
-    $sql = "SELECT * FROM `employees` WHERE 1";
+    $jwt = $_GET['jwt'];
 
-    // run SQL statement
-    $result = mysqli_query($con,$sql);
+    if(is_jwt_valid($jwt))
+    {
+      $sql = "SELECT * FROM `employees` WHERE 1";
 
-    // die if SQL statement failed
-    if (!$result) {
-      http_response_code(404);
-      die(mysqli_error($con));
-    }
-    else{  
-      $resultJson = array("data" => array());
+      // run SQL statement
+      $result = mysqli_query($con,$sql);
 
-      $rows = mysqli_fetch_assoc($result);
-      if (!$rows) {
-        echo "No results!";
-      } else {
-        do {
-          $empId = $rows['EmployeeID'];
-          $firstName = $rows['FirstName'];
-          $lastName = $rows['LastName'];
-          $dob = $rows['DOB'];
-          $email = $rows['Email'];
-          $skillLevel = $rows['SkillLevelID'];
-          $active = $rows['Active'];
-          $age = $rows['Age'];
-
-          if($skillLevel == "7cb03b1e-5c57-11")
-          {
-            $skillLevel = "Junior";
-          }
-          else if($skillLevel == "8dc2281d-5c57-11")
-          {
-            $skillLevel = "Mid-level";
-          }
-          else
-          {
-            $skillLevel = "Senior";
-          }  
-
-          if($active == "1")
-          {
-            $active = "Yes";
-          }
-          else
-          {
-            $active = "No";
-          }
-
-          $empId = bin_to_uuid($empId);
-
-          $resultJson["data"][] = array('employeeID' => $empId, 
-            'firstName' => $firstName, 'lastName' => $lastName, 'dob' 
-            => $dob, 'email' => $email, 'skillLevel' => $skillLevel,
-            'active' => $active, 'age' => $age); 
-
-        } while ($rows = mysqli_fetch_assoc($result));
+      // die if SQL statement failed
+      if (!$result) {
+        http_response_code(404);
+        die(mysqli_error($con));
       }
+      else{  
+        $resultJson = array("data" => array());
 
-      http_response_code(200);
-      echo json_encode($resultJson);
-      mysqli_free_result($result);
-    } 
+        $rows = mysqli_fetch_assoc($result);
+        if (!$rows) {
+          echo "No results!";
+        } 
+        else {
+          do {
+            $empId = $rows['EmployeeID'];
+            $firstName = $rows['FirstName'];
+            $lastName = $rows['LastName'];
+            $dob = $rows['DOB'];
+            $email = $rows['Email'];
+            $skillLevel = $rows['SkillLevelID'];
+            $active = $rows['Active'];
+            $age = $rows['Age'];
+
+            if($skillLevel == "7cb03b1e-5c57-11")
+            {
+              $skillLevel = "Junior";
+            }
+            else if($skillLevel == "8dc2281d-5c57-11")
+            {
+              $skillLevel = "Mid-level";
+            }
+            else
+            {
+              $skillLevel = "Senior";
+            }  
+
+            if($active == "1")
+            {
+              $active = "Yes";
+            }
+            else
+            {
+              $active = "No";
+            }
+
+            $empId = bin_to_uuid($empId);
+
+            $resultJson["data"][] = array('employeeID' => $empId, 
+              'firstName' => $firstName, 'lastName' => $lastName, 'dob' 
+              => $dob, 'email' => $email, 'skillLevel' => $skillLevel,
+              'active' => $active, 'age' => $age); 
+
+          } while ($rows = mysqli_fetch_assoc($result));
+        }
+
+        http_response_code(200);
+        echo json_encode($resultJson);
+        mysqli_free_result($result);
+      } 
+    }
+    else
+    {
+      http_response_code(401);
+    }
+
     break;
   case 'POST': 
-    $firstName = $data->firstName;
-    $lastName = $data->lastName;
-    $dob = $data->dob;
-    $email = $data->email;
-    $skillLevelID = $data->skillLevelID;
-    $active = $data->active;
-    $age = $data->age;
+    if(is_jwt_valid($data->jwt))
+    {
+      $firstName = $data->firstName;
+      $lastName = $data->lastName;
+      $dob = $data->dob;
+      $email = $data->email;
+      $skillLevelID = $data->skillLevelID;
+      $active = $data->active;
+      $age = $data->age;
 
-    //Calculate current age from date of birth and current date
-    $currentDate = new DateTime("now");
-    $birthDate = new DateTime($dob);
-    $age = $birthDate->diff($currentDate)->y;
+      //Calculate current age from date of birth and current date
+      $currentDate = new DateTime("now");
+      $birthDate = new DateTime($dob);
+      $age = $birthDate->diff($currentDate)->y;
 
-    //Generate a GUID to use as the employee ID
-    //Source: Michel Ayres, https://stackoverflow.com/questions/21671179/how-to-generate-a-new-guid
-    $employeeID = sprintf('%04X%04X-%04X-%04X-%04X-%04X%04X%04X', mt_rand(0, 65535), 
-    mt_rand(0, 65535), mt_rand(0, 65535), mt_rand(16384, 20479), 
-    mt_rand(32768, 49151), mt_rand(0, 65535), mt_rand(0, 65535), 
-    mt_rand(0, 65535));
+      //Generate a GUID to use as the employee ID
+      //Source: Michel Ayres, https://stackoverflow.com/questions/21671179/how-to-generate-a-new-guid
+      $employeeID = sprintf('%04X%04X-%04X-%04X-%04X-%04X%04X%04X', mt_rand(0, 65535), 
+        mt_rand(0, 65535), mt_rand(0, 65535), mt_rand(16384, 20479), 
+        mt_rand(32768, 49151), mt_rand(0, 65535), mt_rand(0, 65535), 
+        mt_rand(0, 65535));
 
-    $employeeID = uuid_to_bin($employeeID);
+      $employeeID = uuid_to_bin($employeeID);
 
-    $sql = "INSERT INTO `employees` (EmployeeID, FirstName, LastName, DOB, Email, SkillLevelID, Active, Age) 
-      VALUES ('$employeeID', '$firstName', '$lastName', '$dob', '$email', '$skillLevelID', '$active', '$age')";
+      $sql = "INSERT INTO `employees` (EmployeeID, FirstName, LastName, DOB, Email, SkillLevelID, Active, Age) 
+        VALUES ('$employeeID', '$firstName', '$lastName', '$dob', '$email', '$skillLevelID', '$active', '$age')";
 
-    $result = mysqli_query($con,$sql);
+      $result = mysqli_query($con,$sql);
 
-    if (!$result) {
-      http_response_code(401);
-      die(mysqli_error($con));
-    }
-    else {  
-      if(is_jwt_valid($data->jwt))
-      {
+      if (!$result) {
+        http_response_code(401);
+        die(mysqli_error($con));
+      }
+      else {  
         http_response_code(200);
       }
-      else
-      {
-        //http_response_code(401);
-        echo json_encode($data->jwt);
-      }
+    }
+    else
+    {
+      http_response_code(401);
     }
 
     break;
   case 'PUT': 
-    $employeeID = uuid_to_bin($data->employeeID);
-    $firstName = $data->firstName;
-    $lastName = $data->lastName;
-    $dob = $data->dob;
-    $email = $data->email;
-    $skillLevelID = $data->skillLevelID;
-    $active = $data->active;
-    $age = $data->age;
+    if(is_jwt_valid($data->jwt))
+    {
+      $employeeID = uuid_to_bin($data->employeeID);
+      $firstName = $data->firstName;
+      $lastName = $data->lastName;
+      $dob = $data->dob;
+      $email = $data->email;
+      $skillLevelID = $data->skillLevelID;
+      $active = $data->active;
+      $age = $data->age;
 
-    //Calculate current age from date of birth and current date
-    $currentDate = new DateTime("now");
-    $birthDate = new DateTime($dob);
-    $age = $birthDate->diff($currentDate)->y;
+      //Calculate current age from date of birth and current date
+      $currentDate = new DateTime("now");
+      $birthDate = new DateTime($dob);
+      $age = $birthDate->diff($currentDate)->y;
 
-    $sql = "UPDATE `Employees` SET firstName='$firstName', lastName='$lastName',
-      dob='$dob', email='$email', skillLevelID='$skillLevelID', active='$active',
-      age='$age' WHERE employeeID='$employeeID'";
+      $sql = "UPDATE `Employees` SET firstName='$firstName', lastName='$lastName',
+        dob='$dob', email='$email', skillLevelID='$skillLevelID', active='$active',
+        age='$age' WHERE employeeID='$employeeID'";
 
-    $result = mysqli_query($con,$sql);
+      $result = mysqli_query($con,$sql);
 
-    if (!$result) {
-      http_response_code(401);
-      die(mysqli_error($con));
+      if (!$result) {
+        http_response_code(401);
+        die(mysqli_error($con));
+      }
+      else{  
+        http_response_code(200);
+      }
     }
-    else{  
-      http_response_code(200);
+    else
+    {
+      http_response_code(401);
     }
 
     break;
   case 'DELETE': 
-    $employeeID = uuid_to_bin($data->employeeID);
-    $sql = "DELETE FROM `employees` WHERE employeeID='$employeeID'";
+    if(is_jwt_valid($data->jwt))
+    {
+      $employeeID = uuid_to_bin($data->employeeID);
+      $sql = "DELETE FROM `employees` WHERE employeeID='$employeeID'";
 
-    // run SQL statement
-    $result = mysqli_query($con,$sql);
+      // run SQL statement
+      $result = mysqli_query($con,$sql);
 
-    // die if SQL statement failed
-    if (!$result) {
-      http_response_code(401);
-      die(mysqli_error($con));
-    }
-    else{  
-      if(is_jwt_valid($data->jwt))
-      {
-        http_response_code(200);
-        echo json_encode("JWT validated: " . $data->jwt);
-      }
-      else
-      {
+      // die if SQL statement failed
+      if (!$result) {
         http_response_code(401);
-        echo json_encode($data->jwt);
+        die(mysqli_error($con));
       }
+      else{
+        http_response_code(200);
+      }
+    }
+    else
+    {
+      http_response_code(401);
     }
 
     break;

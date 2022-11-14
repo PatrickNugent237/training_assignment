@@ -21,8 +21,6 @@ const Dashboard = () => {
 
     console.log("body: " + JSON.stringify({ employeeID: empID }));
 
-    //console.log("jwt: " + JSON.stringify({ jwt: jwt }));
-
     console.log("jwt: " + jwt.toString());
 
       $.ajax({
@@ -36,7 +34,14 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
-    fetch("http://localhost:8000/api/Employees.php")
+    const options = {
+      method: 'GET',
+      params: {
+        'jwt': jwt
+      }
+    }
+
+    fetch("http://localhost:8000/api/Employees.php" + "?jwt=" + encodeURIComponent(jwt).replaceAll('%22',''))
       .then((res) => res.json())
       .then(
         (data) => {
