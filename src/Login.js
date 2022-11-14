@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 const Login = () => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
-    const [result, setResult] = useState("");
+    const [error, setError] = useState("");
     const [authenticated, setAuthenticated] = useState(
         sessionStorage.getItem("authenticated") || false);
     const [jwt, setJWT] = useState(
@@ -28,15 +28,21 @@ const Login = () => {
             type: "POST",
             url: form.attr("action"),
             data: form.serialize(),
-            success(data) {
-                setResult(data);
-                console.log(data);
-                setAuthenticated(true);
-                setJWT(data);
-                sessionStorage.setItem("authenticated", true);
-                sessionStorage.setItem("jwt", data);
-                navigate("/dashboard");
-            },
+            statusCode: {
+                200: function(data) {
+                    console.log(data);
+                    setAuthenticated(true);
+                    setJWT(data);
+                    sessionStorage.setItem("authenticated", true);
+                    sessionStorage.setItem("jwt", data);
+                    navigate("/dashboard");
+                    //alert("Logged in successfully");
+                },
+                401: function() {
+                    setError("Incorrect username or password")
+                    alert("Error: failed to authenticate");
+                }
+            }
         });
     };
   
@@ -67,7 +73,7 @@ const Login = () => {
                 <br />
                 <button type="submit">Submit</button>
             </form>
-            <h1>{result}</h1>
+            <h1>{error}</h1>
         </div>
     );
 }

@@ -10,8 +10,9 @@ const Dashboard = () => {
     sessionStorage.getItem("authenticated"));
   const [jwt] = useState(
     sessionStorage.getItem("jwt") || "");
-  const [result, setResult] = useState([]);
+  const [employeeData, setEmployeeData] = useState([]);
   const navigate = useNavigate();
+  const [error, setError] = useState("");
 
   const handleDelete = (empID) => {
     //e.preventDefault();
@@ -27,9 +28,15 @@ const Dashboard = () => {
         type: "DELETE",
         url: "http://localhost:8000/api/Employees.php/" + empID,
         data: JSON.stringify({ employeeID: empID, jwt: JSON.parse(jwt) }),
-        success(data) {
-          console.log("employee deleted successfully with response: " + data)
-        },
+        statusCode: {
+          200: function(data) {
+            alert("Employee deleted successfully");
+            console.log("employee deleted successfully with response: " + data)
+          },
+          401: function() {
+            setError("Error: failed to authenticate");
+          }
+        }
     });
   };
 
@@ -42,16 +49,26 @@ const Dashboard = () => {
     }
 
     fetch("http://localhost:8000/api/Employees.php" + "?jwt=" + encodeURIComponent(jwt).replaceAll('%22',''))
-      .then((res) => res.json())
-      .then(
-        (data) => {
-          console.log(data);
-          setResult(data.data);
-        },
-        (error) => {
-          console.log(error);
+      .then((res) => {
+        //res.json()
+        if(res.status === 200){
+          console.log("SUCCESSS")
+          return res.json();     
         }
-      );
+        else if(res.status === 401){
+          setError("Failed to get list of employees: authentication failed");
+          throw new Error("Failed to get list of employees: authentication failed");
+          //throw new Error(res.status);
+        }
+      })
+      .then((data) => {
+          console.log(data);
+          setEmployeeData(data.data);
+        }
+      )
+      .catch((error) => {
+        console.log(error);
+      });
   }, []);
 
   if (!authenticated) {
@@ -73,7 +90,7 @@ const Dashboard = () => {
           <th>Age</th>
           <th>Options</th>
         </tr>
-        {result.map((item, index) => (
+        {employeeData.map((item, index) => (
           <tr key={index}>
             <td>{item.employeeID}</td>
             <td>{item.firstName}</td>
@@ -89,6 +106,7 @@ const Dashboard = () => {
         ))}
         </tbody>
       </table>
+      <h1>{error}</h1>
       <center><button onClick={() => navigate("/addEmployee")}>Add new employee</button></center>
       </div>
     );

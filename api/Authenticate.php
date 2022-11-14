@@ -104,14 +104,14 @@ if($foundUser != NULL)
 
     if(is_jwt_valid($jwt))
     {
+      http_response_code(200);
       echo json_encode($jwt);
     }
     else
     {
+      http_response_code(401);
       echo json_encode("Invalid token generated");
     }
-
-    http_response_code(200);
   } 
   else {
     echo "Username or password is incorrect";

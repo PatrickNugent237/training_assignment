@@ -8,7 +8,7 @@ import Dropdown from 'react-dropdown';
 import 'react-dropdown/style.css';
 
 const EditEmployee = () => {    
-  const [result, setResult] = useState("");
+  const [error, setError] = useState("");
   const [authenticated, setAuthenticated] = useState(
     sessionStorage.getItem("authenticated")|| false);
   const [jwt] = useState(
@@ -104,12 +104,14 @@ const EditEmployee = () => {
           skillLevelID: skillLevelID, active: active,
           age: employeeData.age, jwt: JSON.parse(jwt)
         }),
-        success(data) {
-          setResult(data);
-          //setAuthenticated(true);
-          //sessionStorage.setItem("authenticated", true);
-          navigate("/dashboard");
-        },
+        statusCode: {
+          200: function(data) {
+            navigate("/dashboard");
+          },
+          401: function() {
+            alert("Error: failed to authenticate");
+          }
+        }
     });
   };
 
@@ -183,7 +185,7 @@ const EditEmployee = () => {
             <br />
             <button type="submit">Submit</button>
         </form>
-        <h1>{result}</h1>
+        <h1>{error}</h1>
     </div>
     );
 }
