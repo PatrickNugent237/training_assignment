@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Navigate, Link, useNavigate } from "react-router-dom";
 //import axios from 'axios';
 import $ from "jquery";
+import "./Dashboard.css"
 
 const Dashboard = () => {
   //const [authenticated, setAuthenticated] = useState(null);
@@ -52,7 +53,6 @@ const Dashboard = () => {
       .then((res) => {
         //res.json()
         if(res.status === 200){
-          console.log("SUCCESSS")
           return res.json();     
         }
         else if(res.status === 401){

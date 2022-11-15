@@ -109,7 +109,7 @@ const EditEmployee = () => {
             navigate("/dashboard");
           },
           401: function() {
-            alert("Error: failed to authenticate");
+            setError("Error: failed to authenticate");
           }
         }
     });

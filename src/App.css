@@ -28,14 +28,14 @@
   color: #61dafb;
 }
 
-form {
+/*form {
   border:2px solid green;
   padding: 30px;
 }
 
 .form-wrapper {
   padding: 5px 20px;
-}
+}*/
 
 @keyframes appLogoSpin {
   from {

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import $ from "jquery";
 import "./App.css";
+import "./Login.css"
 import { useNavigate } from "react-router-dom";
 
 const Login = () => {
@@ -47,12 +48,14 @@ const Login = () => {
     };
   
     return (
-        <div className="App">
+    <div className = "login-container">
+        <div className = "login-form">
             <form
                 action="http://localhost:8000/api/Authenticate.php"
                 method="post"
                 onSubmit={(event) => handleSubmit(event)}
             >
+                <h3>User Login</h3>
                 <label htmlFor="username">Username: </label>
                 <input
                     type="text"
@@ -61,7 +64,6 @@ const Login = () => {
                     value={username}
                     onChange={(event) => handleUsernameChange(event)}
                 />
-
                 <label htmlFor="password">Password: </label>
                 <input
                     type="text"
@@ -71,10 +73,11 @@ const Login = () => {
                     onChange={(event) => handlePasswordChange(event)}
                 />
                 <br />
-                <button type="submit">Submit</button>
+                <button type="submit">Login</button>
             </form>
             <h1>{error}</h1>
         </div>
+    </div>
     );
 }
 
