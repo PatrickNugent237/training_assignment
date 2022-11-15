@@ -76,7 +76,8 @@ const Dashboard = () => {
   } 
   else {
     return (
-      <div>
+      <div className = "dashboard-container">
+      <h3>Dashboard</h3>
       <table>
         <tbody>
         <tr>
@@ -100,14 +101,15 @@ const Dashboard = () => {
             <td>{item.skillLevel}</td>
             <td>{item.active}</td>
             <td>{item.age}</td>
-            <td><button onClick={() => navigate("/editEmployee", { state: { employeeData: item } })}>Edit</button></td>
-            <td><button onClick={() => handleDelete(item.employeeID)}>Delete</button></td>
+            <td><button onClick={() => navigate("/editEmployee", { state: { employeeData: item } })}>Edit</button>
+            <button onClick={() => handleDelete(item.employeeID)}>Delete</button>
+            </td>
           </tr>
         ))}
         </tbody>
       </table>
       <h1>{error}</h1>
-      <center><button onClick={() => navigate("/addEmployee")}>Add new employee</button></center>
+      <center><button id="addButton" onClick={() => navigate("/addEmployee")}>Add new employee</button></center>
       </div>
     );
 }

@@ -13,8 +13,18 @@ const EditEmployee = () => {
     sessionStorage.getItem("authenticated")|| false);
   const [jwt] = useState(
     sessionStorage.getItem("jwt") || "");
-  const location = useLocation();
-  const [employeeData, setEmployeeData] = useState(location.state.employeeData);
+  const location = useLocation() || "";
+  const [employeeData, setEmployeeData] = useState({
+    employeeID: "",
+    firstName: "",
+    lastName: "",
+    dob: "",
+    email: "",
+    skillLevel: "",
+    active: "",
+    age: ""
+  });
+  //const [employeeData, setEmployeeData] = useState(location.state.employeeData);
   const navigate = useNavigate();
 
   const handleFieldChange = (e) => {
@@ -98,7 +108,7 @@ const EditEmployee = () => {
           age: employeeData.age, jwt: JSON.parse(jwt)
         }),
         statusCode: {
-          200: function(data) {
+          200: function() {
             navigate("/dashboard");
           },
           401: function() {
@@ -108,11 +118,23 @@ const EditEmployee = () => {
     });
   };
 
+  useEffect(() => {
+    if(location.state != null)
+    {
+      setEmployeeData(location.state.employeeData);
+    }
+  }, []);
+
   if (!authenticated) {
     return <Navigate replace to="/login" />;
   } 
+  else if(location.state === null)
+  {
+    return <Navigate replace to="/dashboard" />;
+  }
   else {
-    //const {employeeData} = state;
+    //console.log(location);
+    //setEmployeeData(location.state.employeeData);
     return (
         <div className="App">
         <form
