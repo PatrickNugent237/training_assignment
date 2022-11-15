@@ -16,6 +16,12 @@
     color: black;
 }
 
+.dashboard-container h1{
+    font-size: 25px ;
+    margin-bottom: 15px;
+    color: red;
+}
+
 table {
     border-spacing: 0;
     border: 1px solid black;

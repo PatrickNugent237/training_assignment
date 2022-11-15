@@ -32,7 +32,8 @@ const Dashboard = () => {
         statusCode: {
           200: function(data) {
             alert("Employee deleted successfully");
-            console.log("employee deleted successfully with response: " + data)
+            console.log("employee deleted successfully with response: " + data);
+            GetEmployees();
           },
           401: function() {
             setError("Error: failed to authenticate");
@@ -42,6 +43,10 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
+    GetEmployees();
+  }, []);
+
+  const GetEmployees = () => {
     const options = {
       method: 'GET',
       params: {
@@ -69,7 +74,7 @@ const Dashboard = () => {
       .catch((error) => {
         console.log(error);
       });
-  }, []);
+  }
 
   if (!authenticated) {
     return <Navigate replace to="/login" />;
