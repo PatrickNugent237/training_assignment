@@ -6,10 +6,9 @@ import $ from "jquery";
 import "./Dashboard.css"
 
 const Dashboard = () => {
-  //const [authenticated, setAuthenticated] = useState(null);
   const [authenticated, setAuthenticated] = useState(
-    sessionStorage.getItem("authenticated"));
-  const [jwt] = useState(
+    sessionStorage.getItem("authenticated") || false);
+  const [jwt, setJWT] = useState(
     sessionStorage.getItem("jwt") || "");
   const [employeeData, setEmployeeData] = useState([]);
   const navigate = useNavigate();
@@ -42,18 +41,26 @@ const Dashboard = () => {
     });
   };
 
+  /*useEffect(() => {
+    console.log("useEffect authenticated:" + authenticated);
+    if (!authenticated) {
+      console.log("not authenticated, navigating...");
+      navigate("/login");
+    }
+  }, [authenticated]);*/
+
   useEffect(() => {
-    GetEmployees();
+    if (authenticated) {
+      console.log("authenticated, value is: " + authenticated);
+      GetEmployees();
+    }
+    else{
+      console.log("not authenticated, value is: " + authenticated);
+      navigate("/login");
+    }
   }, []);
 
   const GetEmployees = () => {
-    const options = {
-      method: 'GET',
-      params: {
-        'jwt': jwt
-      }
-    }
-
     fetch("http://localhost:8000/api/Employees.php" + "?jwt=" + encodeURIComponent(jwt).replaceAll('%22',''))
       .then((res) => {
         //res.json()
@@ -74,6 +81,14 @@ const Dashboard = () => {
       .catch((error) => {
         console.log(error);
       });
+  }
+
+  const Logout = () => {
+    setAuthenticated(false);
+    setJWT("");
+    sessionStorage.setItem("authenticated", false);
+    sessionStorage.setItem("jwt", "");
+    return <Navigate replace to="/login" />;
   }
 
   if (!authenticated) {
@@ -114,7 +129,8 @@ const Dashboard = () => {
         </tbody>
       </table>
       <h1>{error}</h1>
-      <center><button id="addButton" onClick={() => navigate("/addEmployee")}>Add new employee</button></center>
+      <center><button className="dashboard-buttons" onClick={() => navigate("/addEmployee")}>Add new employee</button></center>
+      <center><button className="dashboard-buttons" onClick={Logout}>Log Out</button></center>
       </div>
     );
 }

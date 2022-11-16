@@ -22,7 +22,7 @@ function bin_to_uuid($bin){
   return join("-", unpack("H8time_low/H4time_mid/H4time_hi/H4clock_seq_hi/H12clock_seq_low", $bin));
 }
 
-//Encodes a base 64 url
+//Encodes a string to base 64
 //Source: https://roytuts.com/how-to-generate-and-validate-jwt-using-php-without-using-third-party-api/
 function base64url_encode($str) {
   return rtrim(strtr(base64_encode($str), '+/', '-_'), '=');
@@ -50,13 +50,7 @@ function is_jwt_valid($jwt, $secret = 'mVm3CSjaT2Q3Y0aqK0qcZVQ1lDFKa9HDQoEepZbVL
 	// verify it matches the signature provided in the jwt
 	$is_signature_valid = ($base64_url_signature === $signature_provided);
 	
-	/*if ($is_token_expired || !$is_signature_valid) {
-		return FALSE;
-	} else {
-		return TRUE;
-	}*/
-
-  if (!$is_signature_valid) {
+	if ($is_token_expired || !$is_signature_valid) {
 		return FALSE;
 	} else {
 		return TRUE;

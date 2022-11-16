@@ -31,20 +31,16 @@ function is_jwt_valid($jwt, $secret = 'mVm3CSjaT2Q3Y0aqK0qcZVQ1lDFKa9HDQoEepZbVL
 
 	// verify it matches the signature provided in the jwt
 	$is_signature_valid = ($base64_url_signature === $signature_provided);
-	
-	/*if ($is_token_expired || !$is_signature_valid) {
-		return FALSE;
-	} else {
-		return TRUE;
-	}*/
 
-  if (!$is_signature_valid) {
+  if ($is_token_expired || !$is_signature_valid) {
 		return FALSE;
 	} else {
 		return TRUE;
 	}
 }
 
+//Generates and returns a jwt
+//Source: https://roytuts.com/how-to-generate-and-validate-jwt-using-php-without-using-third-party-api/
 function generate_jwt($headers, $payload, $secret = 'mVm3CSjaT2Q3Y0aqK0qcZVQ1lDFKa9HDQoEepZbVLzoav25ugriBy7kId9FkOMI') {
 	$headers_encoded = base64url_encode(json_encode($headers));
 	
@@ -58,6 +54,8 @@ function generate_jwt($headers, $payload, $secret = 'mVm3CSjaT2Q3Y0aqK0qcZVQ1lDF
 	return $jwt;
 }
 
+//Encodes a string to base 64
+//Source: https://roytuts.com/how-to-generate-and-validate-jwt-using-php-without-using-third-party-api/
 function base64url_encode($str) {
   return rtrim(strtr(base64_encode($str), '+/', '-_'), '=');
 }
@@ -89,17 +87,8 @@ if($foundUser != NULL)
   $hash = $foundUser->Password;
 
   if (password_verify($password, $hash)) {
-    //echo "Logged in successfully";
-    /*$secret = 'mVm3CSjaT2Q3Y0aqK0qcZVQ1lDFKa9HDQoEepZbVLzoav25ugriBy7kId9FkOMI';
     $headers = array('alg'=>'HS256','typ'=>'JWT');
-    $payload = array('name'=>$username, 
-      'exp'=>(time() + 60),
-      'iss'=> "localhost",
-      'iat'=> time()
-    );*/
-
-    $headers = array('alg'=>'HS256','typ'=>'JWT');
-    $payload = array('sub'=>'1234567890','name'=>'John Doe', 'admin'=>true, 'exp'=>(time() + 60));
+    $payload = array('iss'=>'localhost','name'=>$username, 'exp'=>(time() + 3600));
     $jwt = generate_jwt($headers, $payload);
 
     if(is_jwt_valid($jwt))
