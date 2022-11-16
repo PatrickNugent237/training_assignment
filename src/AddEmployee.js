@@ -10,7 +10,7 @@ import "./EmployeeForm.css"
 
 const EditEmployee = () => {    
   const [error, setError] = useState("");
-  const [authenticated, setAuthenticated] = useState(
+  const [authenticated] = useState(
     sessionStorage.getItem("authenticated")|| false);
   const [jwt] = useState(
     sessionStorage.getItem("jwt") || "");
@@ -32,12 +32,12 @@ const EditEmployee = () => {
     console.log("handling change with value of: " +  value + " and name of: " + name);
     console.log("first name: " + employeeData.firstName);
 
-    setEmployeeData({
-      ...employeeData,
-      [name]: value
-    });
-
-    console.log("first name: " + employeeData.firstName);
+    if(value.length <=60){
+      setEmployeeData({
+        ...employeeData,
+        [name]: value
+      });
+    }
   };
 
   const handleDateChange = (e) => {

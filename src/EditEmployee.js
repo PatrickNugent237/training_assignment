@@ -34,10 +34,12 @@ const EditEmployee = () => {
     console.log("handling change with value of: " +  value + " and name of: " + name);
     console.log("first name: " + employeeData.firstName);
 
-    setEmployeeData({
-      ...employeeData,
-      [name]: value
-    });
+    if(value.length <=60){
+      setEmployeeData({
+        ...employeeData,
+        [name]: value
+      });
+    }
 
     console.log("first name: " + employeeData.firstName);
   };
