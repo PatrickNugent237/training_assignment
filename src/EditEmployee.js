@@ -11,7 +11,7 @@ import "./EmployeeForm.css"
 const EditEmployee = () => {
   const [error, setError] = useState("");
   const [authenticated, setAuthenticated] = useState(
-    sessionStorage.getItem("authenticated")|| false);
+    sessionStorage.getItem("authenticated") || false);
   const [jwt] = useState(
     sessionStorage.getItem("jwt") || "");
   const location = useLocation() || "";

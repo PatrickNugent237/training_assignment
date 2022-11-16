@@ -15,11 +15,15 @@ const Login = () => {
     const navigate = useNavigate();
 
     const handleUsernameChange = (e) => {
-        setUsername(e.target.value);
+        if(e.target.value.length <= 60){
+          setUsername(e.target.value);
+        }
     };
 
     const handlePasswordChange = (e) => {
-      setPassword(e.target.value);
+      if(e.target.value.length <= 60){
+        setPassword(e.target.value);
+      }
     };
   
     const handleSubmit = (e) => {
