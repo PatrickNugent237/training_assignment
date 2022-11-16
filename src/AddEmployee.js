@@ -6,6 +6,7 @@ import $ from "jquery";
 import { format } from 'date-fns'
 import Dropdown from 'react-dropdown';
 import 'react-dropdown/style.css';
+import "./EmployeeForm.css"
 
 const EditEmployee = () => {    
   const [error, setError] = useState("");
@@ -119,9 +120,10 @@ const EditEmployee = () => {
     return <Navigate replace to="/login" />;
   } 
   else {
-    //const {employeeData} = state;
     return (
-        <div className="App">
+      <div className="employee-container">
+        <div className="employee-form">
+        <h3>Add New Employee</h3>
         <form
             action="http://localhost:8000/api/Employees.php"
             method="post"
@@ -161,6 +163,8 @@ const EditEmployee = () => {
             />
             <label htmlFor="skillLevel">Skill Level: </label>
             <Dropdown
+                menuClassName='dropdown-menu'
+                controlClassName='dropdown-control'
                 label="Skill Level"
                 options={[
                   { label: 'Junior', value: 'junior' },
@@ -173,6 +177,8 @@ const EditEmployee = () => {
             />
             <label htmlFor="active">Active: </label>
             <Dropdown
+                menuClassName='dropdown-menu'
+                controlClassName='dropdown-control'
                 label="Active"
                 options={[
                   { label: 'Yes', value: 'yes' },
@@ -185,8 +191,10 @@ const EditEmployee = () => {
             <br />
             <button type="submit">Submit</button>
         </form>
+        <button onClick={() => navigate("/dashboard")}>Back to Dashboard</button>
         <h1>{error}</h1>
-    </div>
+        </div>
+      </div>
     );
 }
 }

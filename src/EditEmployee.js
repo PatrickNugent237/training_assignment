@@ -6,6 +6,7 @@ import $ from "jquery";
 import { format } from 'date-fns'
 import Dropdown from 'react-dropdown';
 import 'react-dropdown/style.css';
+import "./EmployeeForm.css"
 
 const EditEmployee = () => {
   const [error, setError] = useState("");
@@ -24,7 +25,6 @@ const EditEmployee = () => {
     active: "",
     age: ""
   });
-  //const [employeeData, setEmployeeData] = useState(location.state.employeeData);
   const navigate = useNavigate();
 
   const handleFieldChange = (e) => {
@@ -76,11 +76,11 @@ const EditEmployee = () => {
     
     var skillLevelID, active;
 
-    if(employeeData.skillLevel == "Senior")
+    if(employeeData.skillLevel === "Senior")
     {
         skillLevelID = "995112f0-5c57-11";
     }
-    else if(employeeData.skillLevel == "Mid-level")
+    else if(employeeData.skillLevel === "Mid-level")
     {
         skillLevelID = "8dc2281d-5c57-11";
     }
@@ -89,7 +89,7 @@ const EditEmployee = () => {
         skillLevelID = "7cb03b1e-5c57-11";
     }
 
-    if(employeeData.active == "Yes")
+    if(employeeData.active === "Yes")
     {
       active = "1";
     }
@@ -133,10 +133,10 @@ const EditEmployee = () => {
     return <Navigate replace to="/dashboard" />;
   }
   else {
-    //console.log(location);
-    //setEmployeeData(location.state.employeeData);
     return (
-        <div className="App">
+      <div className="employee-container">
+        <div className="employee-form">
+        <h3>Edit Employee Details</h3>
         <form
             action="http://localhost:8000/api/Employees.php"
             method="put"
@@ -176,6 +176,8 @@ const EditEmployee = () => {
             />
             <label htmlFor="skillLevel">Skill Level: </label>
             <Dropdown
+                menuClassName='dropdown-menu'
+                controlClassName='dropdown-control'
                 label="Skill Level"
                 options={[
                   { label: 'Junior', value: 'junior' },
@@ -188,6 +190,8 @@ const EditEmployee = () => {
             />
             <label htmlFor="active">Active: </label>
             <Dropdown
+                menuClassName='dropdown-menu'
+                controlClassName='dropdown-control'
                 label="Active"
                 options={[
                   { label: 'Yes', value: 'yes' },
@@ -200,8 +204,10 @@ const EditEmployee = () => {
             <br />
             <button type="submit">Submit</button>
         </form>
+        <button onClick={() => navigate("/dashboard")}>Back to Dashboard</button>
         <h1>{error}</h1>
-    </div>
+        </div>
+      </div>
     );
 }
 }

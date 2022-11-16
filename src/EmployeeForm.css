@@ -1,0 +1,82 @@
+*{
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+.employee-container{
+    background-color:#1c1b1b;
+    min-height: 100vh;
+}
+
+.employee-form{
+    max-width: 70%;
+    /*height: 100vh;*/
+    margin: 0 auto;
+    padding: 5vw;
+    position: relative; 
+    text-align: center;
+    color: white;
+    background-color:#151414;
+}
+
+.employee-form h3{
+    font-size: 35px ;
+    margin-bottom: 15px;
+    color: white;
+}
+
+.employee-form h1{
+    font-size: 25px ;
+    margin-bottom: 15px;
+    color: red;
+}
+
+.employee-form label{
+    display: block;
+    font-size: 20px;
+    margin-bottom: 5px;
+    text-align: left;
+}
+
+.employee-form input{
+    /*display: block;*/
+    font-size: 20px;
+    border-radius: 4px;
+    box-sizing: border-box;
+    padding: 10px;
+    margin-bottom: 15px;
+    width: 100%;
+    background-color:#404040;
+    color: white;
+}
+
+.dropdown-control,
+.dropdown-menu{
+    font-size: 20px;
+    border-radius: 4px;
+    box-sizing: border-box;
+    padding: 10px;
+    margin-bottom: 15px;
+    width: 100%;
+    background-color: white;
+    color: black;
+    /*background-color:#404040;*/
+    /*color: white;*/
+}
+
+.employee-form button{
+    font-size: 20px;
+    border-radius: 4px;
+    box-sizing: border-box;
+    padding: 10px;
+    width: 100%;
+    margin-bottom: 15px;
+    background-color:#1a3969;
+    color: white;
+}
+
+.employee-form button:hover{
+    background-color:#3b4e6b;
+    color: white;
+}
