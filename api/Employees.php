@@ -147,7 +147,7 @@ switch($_SERVER['REQUEST_METHOD'])
       //$source = 'Redis Server';
       $employees = unserialize($redis->get($key)); 
       http_response_code(200);
-      echo json_encode($resultJson);
+      echo json_encode($employees);
     }
 
     break;
