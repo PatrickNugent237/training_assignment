@@ -63,11 +63,19 @@ switch($_SERVER['REQUEST_METHOD'])
     $jwt = $_GET['jwt'];
 
     $redis = new Redis();
-    $redis->connect('127.0.0.1', 6379);
 
-    $key = $jwt;
+    try{
+      $redis->connect('127.0.0.1', 6379);
 
-    if (!$redis->get($key)) {
+      if ($redis->get($jwt)) {
+        $employees = unserialize($redis->get($jwt)); 
+        http_response_code(200);
+        echo json_encode($employees);
+      }
+    }
+    catch(RedisException $re){
+    }
+
       if(is_jwt_valid($jwt))
       {
         $sql = "SELECT * FROM `employees` WHERE 1";
@@ -130,8 +138,12 @@ switch($_SERVER['REQUEST_METHOD'])
             } while ($rows = mysqli_fetch_assoc($result));
           }
 
-          $redis->set($key, serialize($resultJson));
-          $redis->expire($key, 10);
+          try{
+            $redis->set($jwt, serialize($resultJson));
+            $redis->expire($jwt, 10);
+          }
+          catch(RedisException $re){
+          }
 
           http_response_code(200);
           echo json_encode($resultJson);
@@ -141,14 +153,7 @@ switch($_SERVER['REQUEST_METHOD'])
       else
       {
         http_response_code(401);
-      }
-    } 
-    else {
-      //$source = 'Redis Server';
-      $employees = unserialize($redis->get($key)); 
-      http_response_code(200);
-      echo json_encode($employees);
-    }
+      } 
 
     break;
   case 'POST': 
