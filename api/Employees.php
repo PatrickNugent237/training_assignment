@@ -57,6 +57,29 @@ function is_jwt_valid($jwt, $secret = 'mVm3CSjaT2Q3Y0aqK0qcZVQ1lDFKa9HDQoEepZbVL
 	}
 }
 
+//Takes in a skill level ID and returns the associated skill level name
+function determineSkillLevelName($skillLevelID){
+  if($skillLevelID == "7cb03b1e-5c57-11"){
+    return "Junior";
+  }
+  else if($skillLevelID == "8dc2281d-5c57-11"){
+    return "Mid-level";
+  }
+  else{
+    return "Senior";
+  }  
+}
+
+//Takes in a string and returns yes or no depending on the string passed in
+function determineActiveStatus($active){
+  if($active == "1"){
+    $active = "Yes";
+  }
+  else{
+    $active = "No";
+  }
+}
+
 switch($_SERVER['REQUEST_METHOD'])
 {
   case 'GET':
@@ -71,89 +94,71 @@ switch($_SERVER['REQUEST_METHOD'])
         $employees = unserialize($redis->get($jwt)); 
         http_response_code(200);
         echo json_encode($employees);
+        break;
       }
     }
     catch(RedisException $re){
     }
 
-      if(is_jwt_valid($jwt))
-      {
-        $sql = "SELECT * FROM `employees` WHERE 1";
+    if(is_jwt_valid($jwt))
+    {
+      $sql = "SELECT * FROM `employees` WHERE 1";
 
-        // run SQL statement
-        $result = mysqli_query($con,$sql);
+      // run SQL statement
+      $result = mysqli_query($con,$sql);
 
-        // die if SQL statement failed
-        if (!$result) {
-          http_response_code(404);
-          die(mysqli_error($con));
-        }
-        else{  
-          $resultJson = array("data" => array());
-
-          $rows = mysqli_fetch_assoc($result);
-          if (!$rows) {
-            echo "No results!";
-          } 
-          else {
-            do {
-              $empId = $rows['EmployeeID'];
-              $firstName = $rows['FirstName'];
-              $lastName = $rows['LastName'];
-              $dob = $rows['DOB'];
-              $email = $rows['Email'];
-              $skillLevel = $rows['SkillLevelID'];
-              $active = $rows['Active'];
-              $age = $rows['Age'];
-
-              if($skillLevel == "7cb03b1e-5c57-11")
-              {
-                $skillLevel = "Junior";
-              }
-              else if($skillLevel == "8dc2281d-5c57-11")
-              {
-                $skillLevel = "Mid-level";
-              }
-              else
-              {
-                $skillLevel = "Senior";
-              }  
-
-              if($active == "1")
-              {
-                $active = "Yes";
-              }
-              else
-              {
-                $active = "No";
-              }
-
-              $empId = bin_to_uuid($empId);
-
-              $resultJson["data"][] = array('employeeID' => $empId, 
-                'firstName' => $firstName, 'lastName' => $lastName, 'dob' 
-                => $dob, 'email' => $email, 'skillLevel' => $skillLevel,
-                'active' => $active, 'age' => $age); 
-
-            } while ($rows = mysqli_fetch_assoc($result));
-          }
-
-          try{
-            $redis->set($jwt, serialize($resultJson));
-            $redis->expire($jwt, 10);
-          }
-          catch(RedisException $re){
-          }
-
-          http_response_code(200);
-          echo json_encode($resultJson);
-          mysqli_free_result($result);
-        } 
+      // die if SQL statement failed
+      if (!$result) {
+        http_response_code(404);
+        die(mysqli_error($con));
       }
-      else
-      {
-        http_response_code(401);
+      else{  
+        $resultJson = array("data" => array());
+
+        $rows = mysqli_fetch_assoc($result);
+        if (!$rows) {
+          echo "No results!";
+        } 
+        else {
+          do {
+            $empId = $rows['EmployeeID'];
+            $firstName = $rows['FirstName'];
+            $lastName = $rows['LastName'];
+            $dob = $rows['DOB'];
+            $email = $rows['Email'];
+            $skillLevel = $rows['SkillLevelID'];
+            $active = $rows['Active'];
+            $age = $rows['Age'];
+
+            $skillLevel = determineSkillLevelName($skillLevel);
+            $active = determineActiveStatus($active);
+
+            $empId = bin_to_uuid($empId);
+
+            $resultJson["data"][] = array('employeeID' => $empId, 
+              'firstName' => $firstName, 'lastName' => $lastName, 'dob' 
+              => $dob, 'email' => $email, 'skillLevel' => $skillLevel,
+              'active' => $active, 'age' => $age); 
+
+          } while ($rows = mysqli_fetch_assoc($result));
+        }
+
+        try{
+          $redis->set($jwt, serialize($resultJson));
+          $redis->expire($jwt, 10);
+        }
+        catch(RedisException $re){
+        }
+
+        http_response_code(200);
+        echo json_encode($resultJson);
+        mysqli_free_result($result);
       } 
+    }
+    else
+    {
+      http_response_code(401);
+    } 
 
     break;
   case 'POST': 
