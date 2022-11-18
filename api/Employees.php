@@ -2,10 +2,18 @@
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
 
-$con = mysqli_connect("localhost", "root", "", "projectdb");
+$con;
 
-if (!$con) {
-  die("Connection failed: " . mysqli_connect_error());
+try{
+  $con = mysqli_connect("localhost", "root", "", "projectdb");
+
+  if (!$con) {
+    die("Connection failed: " . mysqli_connect_error());
+  }
+}
+catch(mysqli_sql_exception $mse){
+  http_response_code(404);
+  die("Connection failed");
 }
 
 $data = json_decode(file_get_contents("php://input"));

@@ -60,11 +60,20 @@ function base64url_encode($str) {
   return rtrim(strtr(base64_encode($str), '+/', '-_'), '=');
 }
 
-$con = mysqli_connect("localhost", "root", "", "projectdb");
+$con;
 
-if (!$con) {
-  die("Connection failed: " . mysqli_connect_error());
+try{
+  $con = mysqli_connect("localhost", "root", "", "projectdb");
+
+  if (!$con) {
+    die("Connection failed: " . mysqli_connect_error());
+  }
 }
+catch(mysqli_sql_exception $mse){
+  http_response_code(404);
+  die("Connection failed");
+}
+
 
 $username = $_POST["username"];
 $password = $_POST["password"];

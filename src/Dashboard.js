@@ -72,6 +72,10 @@ const Dashboard = () => {
           throw new Error("Failed to get list of employees: authentication failed");
           //throw new Error(res.status);
         }
+        else if(!res.ok){
+          setError("Error: Failed to get list of employees");
+          throw new Error("Error: Failed to get list of employees");
+        }
       })
       .then((data) => {
           console.log(data);
