@@ -2,14 +2,21 @@
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
 
-$con;
+include_once '../config/Database.php';
 
-$ConfigDetails = parse_ini_file('../../config.ini');
-$dbhost = $ConfigDetails['dbhost'];
-$username = $ConfigDetails['username'];
-$password = $ConfigDetails['password'];
-$dbname = $ConfigDetails['dbname'];
-$secret = $ConfigDetails['secret'];
+$configDetails = parse_ini_file('../../config.ini');
+$secret = $configDetails['secret'];
+
+$database = new Database();
+
+/*$con;
+
+$configDetails = parse_ini_file('../../config.ini');
+$dbhost = $configDetails['dbhost'];
+$username = $configDetails['username'];
+$password = $configDetails['password'];
+$dbname = $configDetails['dbname'];
+$secret = $configDetails['secret'];
 
 try{
   $con = mysqli_connect($dbhost, $username, $password, $dbname);
@@ -21,7 +28,7 @@ try{
 catch(mysqli_sql_exception $mse){
   http_response_code(404);
   die("Connection failed");
-}
+}*/
 
 $data = json_decode(file_get_contents("php://input"));
 
@@ -73,7 +80,7 @@ function is_jwt_valid($jwt, $secret) {
 }
 
 //Takes in a skill level ID and returns the associated skill level name
-function determineSkillLevelName($skillLevelID){
+function determine_skill_Name($skillLevelID){
   if($skillLevelID == "7cb03b1e-5c57-11"){
     return "Junior";
   }
@@ -86,7 +93,7 @@ function determineSkillLevelName($skillLevelID){
 }
 
 //Takes in a string and returns yes or no depending on the string passed in
-function determineActiveStatus($active){
+function determine_active_status($active){
   if($active == "1"){
     return "Yes";
   }
@@ -120,7 +127,10 @@ switch($_SERVER['REQUEST_METHOD'])
       $sql = "SELECT * FROM `employees` WHERE 1";
 
       // run SQL statement
-      $result = mysqli_query($con,$sql);
+      $con = $database->get_database_connection();
+      $result = mysqli_query($con ,$sql);
+
+      $con->close();
 
       // die if SQL statement failed
       if (!$result) {
@@ -145,8 +155,8 @@ switch($_SERVER['REQUEST_METHOD'])
             $active = $rows['Active'];
             $age = $rows['Age'];
 
-            $skillLevel = determineSkillLevelName($skillLevel);
-            $active = determineActiveStatus($active);
+            $skillLevel = determine_skill_Name($skillLevel);
+            $active = determine_active_status($active);
 
             $empId = bin_to_uuid($empId);
 
@@ -204,7 +214,10 @@ switch($_SERVER['REQUEST_METHOD'])
       $sql = "INSERT INTO `employees` (EmployeeID, FirstName, LastName, DOB, Email, SkillLevelID, Active, Age) 
         VALUES ('$employeeBinID', '$firstName', '$lastName', '$dob', '$email', '$skillLevelID', '$active', '$age')";
 
+      $con = $database->get_database_connection();
       $result = mysqli_query($con,$sql);
+
+      $con->close();
 
       if (!$result) {
         http_response_code(401);
@@ -242,7 +255,10 @@ switch($_SERVER['REQUEST_METHOD'])
         dob='$dob', email='$email', skillLevelID='$skillLevelID', active='$active',
         age='$age' WHERE employeeID='$employeeID'";
 
+      $con = $database->get_database_connection();
       $result = mysqli_query($con,$sql);
+
+      $con->close();
 
       if (!$result) {
         http_response_code(401);
@@ -265,7 +281,10 @@ switch($_SERVER['REQUEST_METHOD'])
       $sql = "DELETE FROM `employees` WHERE employeeID='$employeeID'";
 
       // run SQL statement
+      $con = $database->get_database_connection();
       $result = mysqli_query($con,$sql);
+
+      $con->close();
 
       // die if SQL statement failed
       if (!$result) {
@@ -283,7 +302,4 @@ switch($_SERVER['REQUEST_METHOD'])
 
     break;
 }
-
-$con->close();
-
 ?>

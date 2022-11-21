@@ -3,12 +3,20 @@ header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST');
 header('Content-Type: application/json');
 
-$ConfigDetails = parse_ini_file('../../config.ini');
+include_once '../config/Database.php';
+
+/*$ConfigDetails = parse_ini_file('../../config.ini');
 $dbhost = $ConfigDetails['dbhost'];
 $username = $ConfigDetails['username'];
 $password = $ConfigDetails['password'];
 $dbname = $ConfigDetails['dbname'];
-$secret = $ConfigDetails['secret'];
+$secret = $ConfigDetails['secret'];*/
+
+$configDetails = parse_ini_file('../../config.ini');
+$secret = $configDetails['secret'];
+
+$database = new Database();
+$con = $database->get_database_connection();
 
 //Checks whether a JWT is valid
 //Source: https://roytuts.com/how-to-generate-and-validate-jwt-using-php-without-using-third-party-api/
@@ -60,10 +68,10 @@ function base64url_encode($str) {
   return rtrim(strtr(base64_encode($str), '+/', '-_'), '=');
 }
 
-$con;
+//$con;
 
 try{
-  $con = mysqli_connect($dbhost, $username, $password, $dbname);
+  //$con = mysqli_connect($dbhost, $username, $password, $dbname);
 
   if (!$con) {
     die("Connection failed: " . mysqli_connect_error());

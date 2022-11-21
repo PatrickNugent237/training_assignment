@@ -107,7 +107,7 @@ const EditEmployee = () => {
       })
     }).then((res) => {
       if(res.status === 200){
-        return res.json();
+        //return res.json();
       }
       else if(res.status === 401){
         setError("Error: failed to authenticate");
