@@ -2,7 +2,6 @@ import { render } from "@testing-library/react";
 import { useEffect, useState } from "react";
 import { Navigate, Link, useNavigate } from "react-router-dom";
 //import axios from 'axios';
-import $ from "jquery";
 import "./Dashboard.css"
 
 const Dashboard = () => {
@@ -15,39 +14,33 @@ const Dashboard = () => {
   const [error, setError] = useState("");
 
   const handleDelete = (empID) => {
-    //e.preventDefault();
-
     console.log("handleDelete called with parameter: " + empID)
-    //const employeeID = $(e.target);
-
     console.log("body: " + JSON.stringify({ employeeID: empID }));
-
     console.log("jwt: " + jwt.toString());
 
-      $.ajax({
-        type: "DELETE",
-        url: "http://localhost:8000/api/Employees.php/" + empID,
-        data: JSON.stringify({ employeeID: empID, jwt: JSON.parse(jwt) }),
-        statusCode: {
-          200: function(data) {
-            alert("Employee deleted successfully");
-            console.log("employee deleted successfully with response: " + data);
-            GetEmployees();
-          },
-          401: function() {
-            setError("Error: failed to authenticate");
-          }
-        }
+    fetch("http://localhost:8000/api/Employees.php/" + empID, {
+      method: 'DELETE',
+      body: JSON.stringify({ employeeID: empID, jwt: jwt })
+    }).then((res) => {
+      if(res.status === 200){
+      }
+      else if(res.status === 401){
+        setError("Error: failed to authenticate");
+        throw new Error("Error: failed to authenticate");
+      }
+      else if(!res.ok){
+        setError("Error: Failed to delete employee");
+        throw new Error("Error: Failed to delete employee");
+      }
+    })
+    .then((data) => {
+      console.log("employee deleted successfully with response: " + data);
+      GetEmployees();
+    })
+    .catch((error) => {
+      console.log(error);
     });
   };
-
-  /*useEffect(() => {
-    console.log("useEffect authenticated:" + authenticated);
-    if (!authenticated) {
-      console.log("not authenticated, navigating...");
-      navigate("/login");
-    }
-  }, [authenticated]);*/
 
   useEffect(() => {
     if (authenticated) {
@@ -78,10 +71,9 @@ const Dashboard = () => {
         }
       })
       .then((data) => {
-          console.log(data);
-          setEmployeeData(data.data);
-        }
-      )
+        console.log(data);
+        setEmployeeData(data.data);
+      })
       .catch((error) => {
         console.log(error);
       });

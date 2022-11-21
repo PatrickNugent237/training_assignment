@@ -1,8 +1,5 @@
-import { render } from "@testing-library/react";
 import { useEffect, useState } from "react";
 import { Navigate, useNavigate, useLocation } from "react-router-dom";
-//import axios from 'axios';
-import $ from "jquery";
 import { format } from 'date-fns'
 import Dropdown from 'react-dropdown';
 import 'react-dropdown/style.css';
@@ -100,23 +97,32 @@ const EditEmployee = () => {
       active = "0";
     }
 
-    $.ajax({
-        type: "PUT",
-        url: "http://localhost:8000/api/Employees.php/" + employeeData.employeeID,
-        data: JSON.stringify({ employeeID: employeeData.employeeID,
-          firstName: employeeData.firstName, lastName: employeeData.lastName,
-          dob: employeeData.dob, email: employeeData.email, 
-          skillLevelID: skillLevelID, active: active,
-          age: employeeData.age, jwt: JSON.parse(jwt)
-        }),
-        statusCode: {
-          200: function() {
-            navigate("/dashboard");
-          },
-          401: function() {
-            setError("Error: failed to authenticate");
-          }
-        }
+    fetch("http://localhost:8000/api/Employees.php/" + employeeData.employeeID, {
+      method: 'PUT',
+      body: JSON.stringify({ employeeID: employeeData.employeeID,
+        firstName: employeeData.firstName, lastName: employeeData.lastName,
+        dob: employeeData.dob, email: employeeData.email, 
+        skillLevelID: skillLevelID, active: active,
+        age: employeeData.age, jwt: jwt
+      })
+    }).then((res) => {
+      if(res.status === 200){
+        return res.json();
+      }
+      else if(res.status === 401){
+        setError("Error: failed to authenticate");
+        throw new Error("Error: failed to authenticate");
+      }
+      else if(!res.ok){
+        setError("Error: Failed to add employee");
+        throw new Error("Error: Failed to add employee");
+      }
+    })
+    .then(() => {
+      navigate("/dashboard");
+    })
+    .catch((error) => {
+      console.log(error);
     });
   };
 
@@ -140,7 +146,6 @@ const EditEmployee = () => {
         <div className="employee-form">
         <h3>Edit Employee Details</h3>
         <form
-            action="http://localhost:8000/api/Employees.php"
             method="put"
             onSubmit={(event) => handleSubmit(event)}
         >

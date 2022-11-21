@@ -1,5 +1,7 @@
 <?php
 header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: POST');
+header('Content-Type: application/json');
 
 /*require_once realpath(__DIR__ . '../../vendor/autoload.php');
 
@@ -74,9 +76,12 @@ catch(mysqli_sql_exception $mse){
   die("Connection failed");
 }
 
+$data = json_decode(file_get_contents("php://input"));
+//$username = $_POST["username"];
+//$password = $_POST["password"];
 
-$username = $_POST["username"];
-$password = $_POST["password"];
+$username = $data->username;
+$password = $data->password;
 
 $sql = "SELECT * FROM `users` WHERE username='$username'";
 

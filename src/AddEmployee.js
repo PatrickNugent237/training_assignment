@@ -1,8 +1,5 @@
-import { render } from "@testing-library/react";
 import { useEffect, useState } from "react";
 import { Navigate, useNavigate, useLocation } from "react-router-dom";
-//import axios from 'axios';
-import $ from "jquery";
 import { format } from 'date-fns'
 import Dropdown from 'react-dropdown';
 import 'react-dropdown/style.css';
@@ -96,23 +93,34 @@ const EditEmployee = () => {
       active = "0";
     }
 
-    $.ajax({
-        type: "POST",
-        url: "http://localhost:8000/api/Employees.php",
-        data: JSON.stringify({ employeeID: employeeData.employeeID,
-          firstName: employeeData.firstName, lastName: employeeData.lastName,
-          dob: employeeData.dob, email: employeeData.email, 
-          skillLevelID: skillLevelID, active: active,
-          age: employeeData.age, jwt: JSON.parse(jwt)
-        }),
-        statusCode: {
-          200: function(data) {
-            navigate("/dashboard");
-          },
-          401: function() {
-            setError("Error: failed to authenticate");
-          }
-        }
+    fetch("http://localhost:8000/api/Employees.php", {
+      method: 'POST',
+      body: JSON.stringify({ employeeID: employeeData.employeeID,
+        firstName: employeeData.firstName, lastName: employeeData.lastName,
+        dob: employeeData.dob, email: employeeData.email, 
+        skillLevelID: skillLevelID, active: active,
+        age: employeeData.age, jwt: jwt 
+      })
+    }).then((res) => {
+      if(res.status === 200){
+        //console.log(res);
+        return res.json();
+      }
+      else if(res.status === 401){
+        setError("Error: failed to authenticate");
+        throw new Error("Error: failed to authenticate");
+      }
+      else if(!res.ok){
+        setError("Error: Failed to add employee");
+        throw new Error("Error: Failed to add employee");
+      }
+    })
+    .then((data) => {
+      console.log("Employee added with ID: " + data);
+      navigate("/dashboard");
+    })
+    .catch((error) => {
+      console.log(error);
     });
   };
 
@@ -125,7 +133,6 @@ const EditEmployee = () => {
         <div className="employee-form">
         <h3>Add New Employee</h3>
         <form
-            action="http://localhost:8000/api/Employees.php"
             method="post"
             onSubmit={(event) => handleSubmit(event)}
         >

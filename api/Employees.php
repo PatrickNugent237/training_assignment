@@ -81,10 +81,10 @@ function determineSkillLevelName($skillLevelID){
 //Takes in a string and returns yes or no depending on the string passed in
 function determineActiveStatus($active){
   if($active == "1"){
-    $active = "Yes";
+    return "Yes";
   }
   else{
-    $active = "No";
+    return "No";
   }
 }
 
@@ -192,10 +192,10 @@ switch($_SERVER['REQUEST_METHOD'])
         mt_rand(32768, 49151), mt_rand(0, 65535), mt_rand(0, 65535), 
         mt_rand(0, 65535));
 
-      $employeeID = uuid_to_bin($employeeID);
+      $employeeBinID = uuid_to_bin($employeeID);
 
       $sql = "INSERT INTO `employees` (EmployeeID, FirstName, LastName, DOB, Email, SkillLevelID, Active, Age) 
-        VALUES ('$employeeID', '$firstName', '$lastName', '$dob', '$email', '$skillLevelID', '$active', '$age')";
+        VALUES ('$employeeBinID', '$firstName', '$lastName', '$dob', '$email', '$skillLevelID', '$active', '$age')";
 
       $result = mysqli_query($con,$sql);
 
@@ -243,6 +243,7 @@ switch($_SERVER['REQUEST_METHOD'])
       }
       else{  
         http_response_code(200);
+        
       }
     }
     else

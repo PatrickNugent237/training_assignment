@@ -1,5 +1,4 @@
 import { useState } from "react";
-import $ from "jquery";
 import "./App.css";
 import "./Login.css"
 import { useNavigate } from "react-router-dom";
@@ -28,26 +27,34 @@ const Login = () => {
   
     const handleSubmit = (e) => {
         e.preventDefault();
-        const form = $(e.target);
-        $.ajax({
-            type: "POST",
-            url: form.attr("action"),
-            data: form.serialize(),
-            statusCode: {
-                200: function(data) {
-                    console.log(data);
-                    setAuthenticated(true);
-                    setJWT(data);
-                    sessionStorage.setItem("authenticated", true);
-                    sessionStorage.setItem("jwt", data);
-                    navigate("/dashboard");
-                    //alert("Logged in successfully");
-                },
-                401: function() {
-                    setError("Incorrect username or password")
-                    alert("Error: failed to authenticate");
-                }
-            }
+
+        fetch("http://localhost:8000/api/Authenticate.php", {
+          method: 'POST',
+          body: JSON.stringify({ username: username, password: password })
+        }).then((res) => {
+          if(res.status === 200){
+            console.log(res);
+            return res.json();
+          }
+          else if(res.status === 401){
+            setError("Incorrect username or password");
+            throw new Error("Error: Failed to login");
+          }
+          else if(!res.ok){
+            setError("Error: Failed to login");
+            throw new Error("Error: Failed to login");
+          }
+        })
+        .then((data) => {
+          console.log(data);
+          setAuthenticated(true);
+          setJWT(data);
+          sessionStorage.setItem("authenticated", true);
+          sessionStorage.setItem("jwt", data);
+          navigate("/dashboard");
+        })
+        .catch((error) => {
+          console.log(error);
         });
     };
   
@@ -55,7 +62,6 @@ const Login = () => {
     <div className = "login-container">
         <div className = "login-form">
             <form
-                action="http://localhost:8000/api/Authenticate.php"
                 method="post"
                 onSubmit={(event) => handleSubmit(event)}
             >
