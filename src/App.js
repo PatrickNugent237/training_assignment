@@ -1,6 +1,4 @@
-
 import { useState } from "react";
-import $ from "jquery";
 import "./App.css";
   
 function App() {
@@ -19,8 +17,8 @@ function App() {
   
     const handleSumbit = (e) => {
         e.preventDefault();
-        const form = $(e.target);
-        $.ajax({
+        const form = e.target;
+        /*$.ajax({
             type: "POST",
             url: form.attr("action"),
             data: form.serialize(),
@@ -29,7 +27,7 @@ function App() {
                 setauthenticated(true)
                 localStorage.setItem("authenticated", true);
             },
-        });
+        });*/
 
         /*$.ajax({
             type: "GET",
