@@ -1,9 +1,9 @@
 <?php
 
 class Database {
-    public $con;
+    private $con;
 
-    public function get_database_connection(){
+    public static function get_database_connection(){
         try{
             $configDetails = parse_ini_file('../../config.ini');
             $dbhost = $configDetails['dbhost'];

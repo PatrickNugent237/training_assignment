@@ -4,83 +4,13 @@ header('Access-Control-Allow-Methods: POST');
 header('Content-Type: application/json');
 
 include_once '../config/Database.php';
-
-/*$ConfigDetails = parse_ini_file('../../config.ini');
-$dbhost = $ConfigDetails['dbhost'];
-$username = $ConfigDetails['username'];
-$password = $ConfigDetails['password'];
-$dbname = $ConfigDetails['dbname'];
-$secret = $ConfigDetails['secret'];*/
+include_once '../config/Utilities.php';
 
 $configDetails = parse_ini_file('../../config.ini');
 $secret = $configDetails['secret'];
 
 $database = new Database();
-$con = $database->get_database_connection();
-
-//Checks whether a JWT is valid
-//Source: https://roytuts.com/how-to-generate-and-validate-jwt-using-php-without-using-third-party-api/
-function is_jwt_valid($jwt, $secret) {
-	// split the jwt
-	$tokenParts = explode('.', $jwt);
-	$header = base64_decode($tokenParts[0]);
-	$payload = base64_decode($tokenParts[1]);
-	$signature_provided = $tokenParts[2];
-
-	// check the expiration time - note this will cause an error if there is no 'exp' claim in the jwt
-	$expiration = json_decode($payload)->exp;
-	$is_token_expired = ($expiration - time()) < 0;
-
-	// build a signature based on the header and payload using the secret
-	$base64_url_header = base64url_encode($header);
-	$base64_url_payload = base64url_encode($payload);
-	$signature = hash_hmac('SHA256', $base64_url_header . "." . $base64_url_payload, $secret, true);
-	$base64_url_signature = base64url_encode($signature);
-
-	// verify it matches the signature provided in the jwt
-	$is_signature_valid = ($base64_url_signature === $signature_provided);
-
-  if ($is_token_expired || !$is_signature_valid) {
-		return FALSE;
-	} else {
-		return TRUE;
-	}
-}
-
-//Generates and returns a jwt
-//Source: https://roytuts.com/how-to-generate-and-validate-jwt-using-php-without-using-third-party-api/
-function generate_jwt($headers, $payload, $secret) {
-	$headers_encoded = base64url_encode(json_encode($headers));
-	
-	$payload_encoded = base64url_encode(json_encode($payload));
-	
-	$signature = hash_hmac('SHA256', "$headers_encoded.$payload_encoded", $secret, true);
-	$signature_encoded = base64url_encode($signature);
-	
-	$jwt = "$headers_encoded.$payload_encoded.$signature_encoded";
-	
-	return $jwt;
-}
-
-//Encodes a string to base 64
-//Source: https://roytuts.com/how-to-generate-and-validate-jwt-using-php-without-using-third-party-api/
-function base64url_encode($str) {
-  return rtrim(strtr(base64_encode($str), '+/', '-_'), '=');
-}
-
-//$con;
-
-try{
-  //$con = mysqli_connect($dbhost, $username, $password, $dbname);
-
-  if (!$con) {
-    die("Connection failed: " . mysqli_connect_error());
-  }
-}
-catch(mysqli_sql_exception $mse){
-  http_response_code(404);
-  die("Connection failed");
-}
+$con = Database::get_database_connection();
 
 $data = json_decode(file_get_contents("php://input"));
 
@@ -107,9 +37,9 @@ if($foundUser != NULL)
   if (password_verify($password, $hash)) {
     $headers = array('alg'=>'HS256','typ'=>'JWT');
     $payload = array('iss'=>'localhost','name'=>$username, 'exp'=>(time() + 3600));
-    $jwt = generate_jwt($headers, $payload, $secret);
+    $jwt = Utilities::generate_jwt($headers, $payload, $secret);
 
-    if(is_jwt_valid($jwt, $secret))
+    if(Utilities::is_jwt_valid($jwt, $secret))
     {
       http_response_code(200);
       echo json_encode($jwt);
