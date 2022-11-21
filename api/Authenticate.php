@@ -3,18 +3,16 @@ header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST');
 header('Content-Type: application/json');
 
-/*require_once realpath(__DIR__ . '../../vendor/autoload.php');
-
-// Looing for .env at the root directory
-$dotenv = Dotenv\Dotenv::createUnsafeImmutable(__DIR__);
-$dotenv->load();
-
-// Retrive env variable
-$secret = $_ENV['JWT_SECRET'] ?? '';*/
+$ConfigDetails = parse_ini_file('../../config.ini');
+$dbhost = $ConfigDetails['dbhost'];
+$username = $ConfigDetails['username'];
+$password = $ConfigDetails['password'];
+$dbname = $ConfigDetails['dbname'];
+$secret = $ConfigDetails['secret'];
 
 //Checks whether a JWT is valid
 //Source: https://roytuts.com/how-to-generate-and-validate-jwt-using-php-without-using-third-party-api/
-function is_jwt_valid($jwt, $secret = 'mVm3CSjaT2Q3Y0aqK0qcZVQ1lDFKa9HDQoEepZbVLzoav25ugriBy7kId9FkOMI') {
+function is_jwt_valid($jwt, $secret) {
 	// split the jwt
 	$tokenParts = explode('.', $jwt);
 	$header = base64_decode($tokenParts[0]);
@@ -43,7 +41,7 @@ function is_jwt_valid($jwt, $secret = 'mVm3CSjaT2Q3Y0aqK0qcZVQ1lDFKa9HDQoEepZbVL
 
 //Generates and returns a jwt
 //Source: https://roytuts.com/how-to-generate-and-validate-jwt-using-php-without-using-third-party-api/
-function generate_jwt($headers, $payload, $secret = 'mVm3CSjaT2Q3Y0aqK0qcZVQ1lDFKa9HDQoEepZbVLzoav25ugriBy7kId9FkOMI') {
+function generate_jwt($headers, $payload, $secret) {
 	$headers_encoded = base64url_encode(json_encode($headers));
 	
 	$payload_encoded = base64url_encode(json_encode($payload));
@@ -65,7 +63,7 @@ function base64url_encode($str) {
 $con;
 
 try{
-  $con = mysqli_connect("localhost", "root", "", "projectdb");
+  $con = mysqli_connect($dbhost, $username, $password, $dbname);
 
   if (!$con) {
     die("Connection failed: " . mysqli_connect_error());
@@ -77,8 +75,6 @@ catch(mysqli_sql_exception $mse){
 }
 
 $data = json_decode(file_get_contents("php://input"));
-//$username = $_POST["username"];
-//$password = $_POST["password"];
 
 $username = $data->username;
 $password = $data->password;
@@ -103,9 +99,9 @@ if($foundUser != NULL)
   if (password_verify($password, $hash)) {
     $headers = array('alg'=>'HS256','typ'=>'JWT');
     $payload = array('iss'=>'localhost','name'=>$username, 'exp'=>(time() + 3600));
-    $jwt = generate_jwt($headers, $payload);
+    $jwt = generate_jwt($headers, $payload, $secret);
 
-    if(is_jwt_valid($jwt))
+    if(is_jwt_valid($jwt, $secret))
     {
       http_response_code(200);
       echo json_encode($jwt);

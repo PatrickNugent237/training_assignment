@@ -4,8 +4,15 @@ header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
 
 $con;
 
+$ConfigDetails = parse_ini_file('../../config.ini');
+$dbhost = $ConfigDetails['dbhost'];
+$username = $ConfigDetails['username'];
+$password = $ConfigDetails['password'];
+$dbname = $ConfigDetails['dbname'];
+$secret = $ConfigDetails['secret'];
+
 try{
-  $con = mysqli_connect("localhost", "root", "", "projectdb");
+  $con = mysqli_connect($dbhost, $username, $password, $dbname);
 
   if (!$con) {
     die("Connection failed: " . mysqli_connect_error());
@@ -38,7 +45,7 @@ function base64url_encode($str) {
 
 //Checks whether a JWT is valid
 //Source: https://roytuts.com/how-to-generate-and-validate-jwt-using-php-without-using-third-party-api/
-function is_jwt_valid($jwt, $secret = 'mVm3CSjaT2Q3Y0aqK0qcZVQ1lDFKa9HDQoEepZbVLzoav25ugriBy7kId9FkOMI') {
+function is_jwt_valid($jwt, $secret) {
 	// split the jwt
 	$tokenParts = explode('.', $jwt);
 	$header = base64_decode($tokenParts[0]);
@@ -108,7 +115,7 @@ switch($_SERVER['REQUEST_METHOD'])
     catch(RedisException $re){
     }
 
-    if(is_jwt_valid($jwt))
+    if(is_jwt_valid($jwt, $secret))
     {
       $sql = "SELECT * FROM `employees` WHERE 1";
 
@@ -170,7 +177,7 @@ switch($_SERVER['REQUEST_METHOD'])
 
     break;
   case 'POST': 
-    if(is_jwt_valid($data->jwt))
+    if(is_jwt_valid($data->jwt, $secret))
     {
       $firstName = $data->firstName;
       $lastName = $data->lastName;
@@ -215,7 +222,7 @@ switch($_SERVER['REQUEST_METHOD'])
 
     break;
   case 'PUT': 
-    if(is_jwt_valid($data->jwt))
+    if(is_jwt_valid($data->jwt, $secret))
     {
       $employeeID = uuid_to_bin($data->employeeID);
       $firstName = $data->firstName;
@@ -243,7 +250,6 @@ switch($_SERVER['REQUEST_METHOD'])
       }
       else{  
         http_response_code(200);
-        
       }
     }
     else
@@ -253,7 +259,7 @@ switch($_SERVER['REQUEST_METHOD'])
 
     break;
   case 'DELETE': 
-    if(is_jwt_valid($data->jwt))
+    if(is_jwt_valid($data->jwt, $secret))
     {
       $employeeID = uuid_to_bin($data->employeeID);
       $sql = "DELETE FROM `employees` WHERE employeeID='$employeeID'";
