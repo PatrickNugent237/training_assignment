@@ -4,7 +4,7 @@ header('Access-Control-Allow-Methods: POST');
 header('Content-Type: application/json');
 
 include_once '../config/Database.php';
-include_once '../config/Utilities.php';
+include_once '../utilities/Utilities.php';
 
 $configDetails = parse_ini_file('../../config.ini');
 $secret = $configDetails['secret'];
@@ -30,8 +30,7 @@ if (!$result) {
 
 $foundUser = mysqli_fetch_object($result);
 
-if($foundUser != NULL)
-{
+if($foundUser != NULL) {
   $hash = $foundUser->Password;
 
   if (password_verify($password, $hash)) {
@@ -39,13 +38,11 @@ if($foundUser != NULL)
     $payload = array('iss'=>'localhost','name'=>$username, 'exp'=>(time() + 3600));
     $jwt = Utilities::generate_jwt($headers, $payload, $secret);
 
-    if(Utilities::is_jwt_valid($jwt, $secret))
-    {
+    if(Utilities::is_jwt_valid($jwt, $secret)) {
       http_response_code(200);
       echo json_encode($jwt);
     }
-    else
-    {
+    else {
       http_response_code(401);
       echo json_encode("Invalid token generated");
     }
@@ -55,8 +52,7 @@ if($foundUser != NULL)
     http_response_code(401);
   }
 }
-else
-{
+else {
   echo "Username or password is incorrect";
   http_response_code(401);
 }

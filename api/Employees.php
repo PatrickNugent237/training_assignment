@@ -3,7 +3,7 @@ header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
 
 include_once '../config/Database.php';
-include_once '../config/Utilities.php';
+include_once '../utilities/Utilities.php';
 
 $configDetails = parse_ini_file('../../config.ini');
 $secret = $configDetails['secret'];
@@ -11,36 +11,35 @@ $secret = $configDetails['secret'];
 $data = json_decode(file_get_contents("php://input"));
 
 //Takes in a skill level ID and returns the associated skill level name
-function determine_skill_Name($skillLevelID){
-  if($skillLevelID == "7cb03b1e-5c57-11"){
+function determine_skill_Name($skillLevelID) {
+  if($skillLevelID == "7cb03b1e-5c57-11") {
     return "Junior";
   }
-  else if($skillLevelID == "8dc2281d-5c57-11"){
+  else if($skillLevelID == "8dc2281d-5c57-11") {
     return "Mid-level";
   }
-  else{
+  else {
     return "Senior";
   }  
 }
 
 //Takes in a string and returns yes or no depending on the string passed in
-function determine_active_status($active){
-  if($active == "1"){
+function determine_active_status($active) {
+  if($active == "1") {
     return "Yes";
   }
-  else{
+  else {
     return "No";
   }
 }
 
-switch($_SERVER['REQUEST_METHOD'])
-{
+switch($_SERVER['REQUEST_METHOD']) {
   case 'GET':
     $jwt = $_GET['jwt'];
 
     $redis = new Redis();
 
-    try{
+    try {
       $redis->connect('127.0.0.1', 6379);
 
       if ($redis->get($jwt)) {
@@ -50,11 +49,10 @@ switch($_SERVER['REQUEST_METHOD'])
         break;
       }
     }
-    catch(RedisException $re){
+    catch(RedisException $re) {
     }
 
-    if(Utilities::is_jwt_valid($jwt, $secret))
-    {
+    if(Utilities::is_jwt_valid($jwt, $secret)) {
       $sql = "SELECT * FROM `employees` WHERE 1";
 
       // run SQL statement
@@ -68,7 +66,7 @@ switch($_SERVER['REQUEST_METHOD'])
         http_response_code(404);
         die(mysqli_error($con));
       }
-      else{  
+      else {  
         $resultJson = array("data" => array());
 
         $rows = mysqli_fetch_assoc($result);
@@ -99,11 +97,11 @@ switch($_SERVER['REQUEST_METHOD'])
           } while ($rows = mysqli_fetch_assoc($result));
         }
 
-        try{
+        try {
           $redis->set($jwt, serialize($resultJson));
           $redis->expire($jwt, 10);
         }
-        catch(RedisException $re){
+        catch(RedisException $re) {
         }
 
         http_response_code(200);
@@ -111,15 +109,13 @@ switch($_SERVER['REQUEST_METHOD'])
         mysqli_free_result($result);
       } 
     }
-    else
-    {
+    else {
       http_response_code(401);
     } 
 
     break;
   case 'POST': 
-    if(Utilities::is_jwt_valid($data->jwt, $secret))
-    {
+    if(Utilities::is_jwt_valid($data->jwt, $secret)) {
       $firstName = $data->firstName;
       $lastName = $data->lastName;
       $dob = $data->dob;
@@ -159,15 +155,13 @@ switch($_SERVER['REQUEST_METHOD'])
         echo json_encode($employeeID);
       }
     }
-    else
-    {
+    else {
       http_response_code(401);
     }
 
     break;
   case 'PUT': 
-    if(Utilities::is_jwt_valid($data->jwt, $secret))
-    {
+    if(Utilities::is_jwt_valid($data->jwt, $secret)) {
       $employeeID = Utilities::uuid_to_bin($data->employeeID);
       $firstName = $data->firstName;
       $lastName = $data->lastName;
@@ -199,15 +193,13 @@ switch($_SERVER['REQUEST_METHOD'])
         http_response_code(200);
       }
     }
-    else
-    {
+    else {
       http_response_code(401);
     }
 
     break;
   case 'DELETE': 
-    if(Utilities::is_jwt_valid($data->jwt, $secret))
-    {
+    if(Utilities::is_jwt_valid($data->jwt, $secret)) {
       $employeeID = Utilities::uuid_to_bin($data->employeeID);
       $sql = "DELETE FROM `employees` WHERE employeeID='$employeeID'";
 
@@ -222,12 +214,11 @@ switch($_SERVER['REQUEST_METHOD'])
         http_response_code(401);
         die(mysqli_error($con));
       }
-      else{
+      else {
         http_response_code(200);
       }
     }
-    else
-    {
+    else {
       http_response_code(401);
     }
 

@@ -3,8 +3,8 @@
 class Database {
     private $con;
 
-    public static function get_database_connection(){
-        try{
+    public static function get_database_connection() {
+        try {
             $configDetails = parse_ini_file('../../config.ini');
             $dbhost = $configDetails['dbhost'];
             $username = $configDetails['username'];
@@ -19,7 +19,7 @@ class Database {
 
             return $con;
         }
-        catch(mysqli_sql_exception $mse){
+        catch(mysqli_sql_exception $mse) {
             http_response_code(404);
             die("Connection failed");
         }

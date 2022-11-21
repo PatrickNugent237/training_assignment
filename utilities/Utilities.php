@@ -53,13 +53,13 @@ class Utilities {
 
     //Takes in a uuid and turns it into 16 bytes binary form
     //Source: qdev, https://stackoverflow.com/questions/2839037/php-mysql-storing-and-retrieving-uuids
-    public static function uuid_to_bin($uuid){
+    public static function uuid_to_bin($uuid) {
         return pack("H*", str_replace('-', '', $uuid));
     }
   
     //Takes in a 16 bytes binary value and turns it into uuid form
     //Source: qdev, https://stackoverflow.com/questions/2839037/php-mysql-storing-and-retrieving-uuids
-    public static function bin_to_uuid($bin){
+    public static function bin_to_uuid($bin) {
         return join("-", unpack("H8time_low/H4time_mid/H4time_hi/H4clock_seq_hi/H12clock_seq_low", $bin));
     }
 }

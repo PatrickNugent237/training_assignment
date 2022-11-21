@@ -29,7 +29,7 @@ const EditEmployee = () => {
     console.log("handling change with value of: " +  value + " and name of: " + name);
     console.log("first name: " + employeeData.firstName);
 
-    if(value.length <=60){
+    if(value.length <=60) {
       setEmployeeData({
         ...employeeData,
         [name]: value
@@ -43,8 +43,7 @@ const EditEmployee = () => {
 
     console.log(currentDate);
 
-    if(value < currentDate)
-    {
+    if(value < currentDate) {
       setEmployeeData({
         ...employeeData,
         dob: value
@@ -71,25 +70,20 @@ const EditEmployee = () => {
     
     var skillLevelID, active;
 
-    if(employeeData.skillLevel == "Senior")
-    {
+    if(employeeData.skillLevel == "Senior") {
         skillLevelID = "995112f0-5c57-11";
     }
-    else if(employeeData.skillLevel == "Mid-level")
-    {
+    else if(employeeData.skillLevel == "Mid-level") {
         skillLevelID = "8dc2281d-5c57-11";
     }
-    else
-    {
+    else {
         skillLevelID = "7cb03b1e-5c57-11";
     }
 
-    if(employeeData.active == "Yes")
-    {
+    if(employeeData.active == "Yes") {
       active = "1";
     }
-    else
-    {
+    else {
       active = "0";
     }
 
@@ -102,15 +96,15 @@ const EditEmployee = () => {
         age: employeeData.age, jwt: jwt 
       })
     }).then((res) => {
-      if(res.status === 200){
+      if(res.status === 200) {
         //console.log(res);
         return res.json();
       }
-      else if(res.status === 401){
+      else if(res.status === 401) {
         setError("Error: failed to authenticate");
         throw new Error("Error: failed to authenticate");
       }
-      else if(!res.ok){
+      else if(!res.ok) {
         setError("Error: Failed to add employee");
         throw new Error("Error: Failed to add employee");
       }
@@ -203,7 +197,7 @@ const EditEmployee = () => {
         </div>
       </div>
     );
-}
+  }
 }
 
 export default EditEmployee;

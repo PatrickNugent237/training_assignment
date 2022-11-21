@@ -14,13 +14,13 @@ const Login = () => {
     const navigate = useNavigate();
 
     const handleUsernameChange = (e) => {
-        if(e.target.value.length <= 60){
+        if(e.target.value.length <= 60) {
           setUsername(e.target.value);
         }
     };
 
     const handlePasswordChange = (e) => {
-      if(e.target.value.length <= 60){
+      if(e.target.value.length <= 60) {
         setPassword(e.target.value);
       }
     };
@@ -32,15 +32,15 @@ const Login = () => {
           method: 'POST',
           body: JSON.stringify({ username: username, password: password })
         }).then((res) => {
-          if(res.status === 200){
-            console.log(res);
+          if(res.status === 200) {
+            console.log(res); 
             return res.json();
           }
-          else if(res.status === 401){
+          else if(res.status === 401) {
             setError("Incorrect username or password");
             throw new Error("Error: Failed to login");
           }
-          else if(!res.ok){
+          else if(!res.ok) {
             setError("Error: Failed to login");
             throw new Error("Error: Failed to login");
           }

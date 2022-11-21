@@ -47,8 +47,7 @@ const EditEmployee = () => {
 
     console.log(currentDate);
 
-    if(value < currentDate)
-    {
+    if(value < currentDate) {
       setEmployeeData({
         ...employeeData,
         dob: value
@@ -75,25 +74,20 @@ const EditEmployee = () => {
     
     var skillLevelID, active;
 
-    if(employeeData.skillLevel === "Senior")
-    {
+    if(employeeData.skillLevel === "Senior") {
         skillLevelID = "995112f0-5c57-11";
     }
-    else if(employeeData.skillLevel === "Mid-level")
-    {
+    else if(employeeData.skillLevel === "Mid-level") {
         skillLevelID = "8dc2281d-5c57-11";
     }
-    else
-    {
+    else {
         skillLevelID = "7cb03b1e-5c57-11";
     }
 
-    if(employeeData.active === "Yes")
-    {
+    if(employeeData.active === "Yes") {
       active = "1";
     }
-    else
-    {
+    else {
       active = "0";
     }
 
@@ -106,14 +100,14 @@ const EditEmployee = () => {
         age: employeeData.age, jwt: jwt
       })
     }).then((res) => {
-      if(res.status === 200){
+      if(res.status === 200) {
         //return res.json();
       }
-      else if(res.status === 401){
+      else if(res.status === 401) {
         setError("Error: failed to authenticate");
         throw new Error("Error: failed to authenticate");
       }
-      else if(!res.ok){
+      else if(!res.ok) {
         setError("Error: Failed to add employee");
         throw new Error("Error: Failed to add employee");
       }
@@ -127,8 +121,7 @@ const EditEmployee = () => {
   };
 
   useEffect(() => {
-    if(location.state != null)
-    {
+    if(location.state != null) {
       setEmployeeData(location.state.employeeData);
     }
   }, []);
@@ -136,8 +129,7 @@ const EditEmployee = () => {
   if (!authenticated) {
     return <Navigate replace to="/login" />;
   } 
-  else if(location.state === null)
-  {
+  else if(location.state === null) {
     return <Navigate replace to="/dashboard" />;
   }
   else {

@@ -22,13 +22,13 @@ const Dashboard = () => {
       method: 'DELETE',
       body: JSON.stringify({ employeeID: empID, jwt: jwt })
     }).then((res) => {
-      if(res.status === 200){
+      if(res.status === 200) {
       }
-      else if(res.status === 401){
+      else if(res.status === 401) {
         setError("Error: failed to authenticate");
         throw new Error("Error: failed to authenticate");
       }
-      else if(!res.ok){
+      else if(!res.ok) {
         setError("Error: Failed to delete employee");
         throw new Error("Error: Failed to delete employee");
       }
@@ -47,7 +47,7 @@ const Dashboard = () => {
       console.log("authenticated, value is: " + authenticated);
       GetEmployees();
     }
-    else{
+    else {
       console.log("not authenticated, value is: " + authenticated);
       navigate("/login");
     }
@@ -57,15 +57,15 @@ const Dashboard = () => {
     fetch("http://localhost:8000/api/Employees.php" + "?jwt=" + encodeURIComponent(jwt).replaceAll('%22',''))
       .then((res) => {
         //res.json()
-        if(res.status === 200){
+        if(res.status === 200) {
           return res.json();     
         }
-        else if(res.status === 401){
+        else if(res.status === 401) {
           setError("Failed to get list of employees: authentication failed");
           throw new Error("Failed to get list of employees: authentication failed");
           //throw new Error(res.status);
         }
-        else if(!res.ok){
+        else if(!res.ok) {
           setError("Error: Failed to get list of employees");
           throw new Error("Error: Failed to get list of employees");
         }
