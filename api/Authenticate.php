@@ -9,7 +9,6 @@ include_once '../utilities/Utilities.php';
 $configDetails = parse_ini_file('../../config.ini');
 $secret = $configDetails['secret'];
 
-$database = new Database();
 $con = Database::get_database_connection();
 
 $data = json_decode(file_get_contents("php://input"));

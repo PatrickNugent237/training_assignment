@@ -1,8 +1,8 @@
 import { render } from "@testing-library/react";
 import { useEffect, useState } from "react";
 import { Navigate, Link, useNavigate } from "react-router-dom";
-//import axios from 'axios';
 import "./Dashboard.css"
+import AddEmployee from './AddEmployee';
 
 const Dashboard = () => {
   const [authenticated, setAuthenticated] = useState(
@@ -12,6 +12,9 @@ const Dashboard = () => {
   const [employeeData, setEmployeeData] = useState([]);
   const navigate = useNavigate();
   const [error, setError] = useState("");
+  const [showEmployeeTable, setShowEmployeeTable] = useState(true);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [showEditForm, setShowEditForm] = useState(false);
 
   const handleDelete = (empID) => {
     console.log("handleDelete called with parameter: " + empID)
@@ -94,7 +97,7 @@ const Dashboard = () => {
     return (
       <div className = "dashboard-container">
       <h3>Dashboard</h3>
-      <table>
+      {showEmployeeTable ? <table>
         <tbody>
         <tr>
           <th>Employee ID</th>
@@ -123,13 +126,14 @@ const Dashboard = () => {
           </tr>
         ))}
         </tbody>
-      </table>
+      </table> : null }
       <h1>{error}</h1>
-      <center><button className="dashboard-buttons" onClick={() => navigate("/addEmployee")}>Add new employee</button></center>
-      <center><button className="dashboard-buttons" onClick={Logout}>Log Out</button></center>
+      {showAddForm ? <AddEmployee/> : null}
+      {showEmployeeTable ? <center><button className="dashboard-buttons" onClick={() => [setShowAddForm(true), setShowEmployeeTable(false)]}>Add new employee</button></center> : null } 
+      {showEmployeeTable ?<center><button className="dashboard-buttons" onClick={Logout}>Log Out</button></center> : null}
       </div>
     );
-}
+  }
 }
 
 export default Dashboard;

@@ -5,7 +5,7 @@ import Dropdown from 'react-dropdown';
 import 'react-dropdown/style.css';
 import "./EmployeeForm.css"
 
-const EditEmployee = () => {    
+const AddEmployee = () => {    
   const [error, setError] = useState("");
   const [authenticated] = useState(
     sessionStorage.getItem("authenticated")|| false);
@@ -200,4 +200,4 @@ const EditEmployee = () => {
   }
 }
 
-export default EditEmployee;
+export default AddEmployee;
