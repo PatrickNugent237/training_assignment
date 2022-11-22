@@ -5,7 +5,7 @@ import Dropdown from 'react-dropdown';
 import 'react-dropdown/style.css';
 import "./EmployeeForm.css"
 
-const EditEmployee = () => {
+export default function EditEmployee({detailsToEdit}){
   const [error, setError] = useState("");
   const [authenticated, setAuthenticated] = useState(
     sessionStorage.getItem("authenticated") || false);
@@ -13,14 +13,14 @@ const EditEmployee = () => {
     sessionStorage.getItem("jwt") || "");
   const location = useLocation() || "";
   const [employeeData, setEmployeeData] = useState({
-    employeeID: "",
-    firstName: "",
-    lastName: "",
-    dob: "",
-    email: "",
-    skillLevel: "",
-    active: "",
-    age: ""
+    employeeID: detailsToEdit.employeeID,
+    firstName: detailsToEdit.firstName,
+    lastName: detailsToEdit.lastName,
+    dob: detailsToEdit.dob,
+    email: detailsToEdit.email,
+    skillLevel: detailsToEdit.skillLevel,
+    active: detailsToEdit.active,
+    age: detailsToEdit.age
   });
   const navigate = useNavigate();
 
@@ -152,7 +152,7 @@ const EditEmployee = () => {
   if (!authenticated) {
     return <Navigate replace to="/login" />;
   } 
-  else if(location.state === null) {
+  else if(detailsToEdit === null) {
     return <Navigate replace to="/dashboard" />;
   }
   else {
@@ -234,4 +234,4 @@ const EditEmployee = () => {
 }
 }
 
-export default EditEmployee;
+//export default EditEmployee;
