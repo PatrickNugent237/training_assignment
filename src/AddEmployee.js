@@ -22,6 +22,12 @@ const AddEmployee = () => {
   });
   const navigate = useNavigate();
 
+  /// <summary>
+  /// Handles changes in most of the input fields in the form for adding
+  /// employees. Sets the new value in EmployeeData based on the name and 
+  /// value retrieved from the event.
+  /// </summary>
+  /// <param name="e">Event to retrieve new value from</param>
   const handleFieldChange = (e) => {
     const name = e.target.name;
     const value = e.target.value;
@@ -37,6 +43,11 @@ const AddEmployee = () => {
     }
   };
 
+  /// <summary>
+  /// Handles changes in the date input field and checks that the new date being
+  /// set is not greater than the current date.
+  /// </summary>
+  /// <param name="e">Event to retrieve new value from</param>
   const handleDateChange = (e) => {
     const value = e.target.value;
     const currentDate = format(new Date(), 'yyyy-MM-dd');
@@ -51,6 +62,10 @@ const AddEmployee = () => {
     }
   };
 
+  /// <summary>
+  /// Handles changes in the "skill level" dropdown input field.
+  /// </summary>
+  /// <param name="option">The option chosen by the user</param>
   const handleSkillLevelSelect = (option) => {
     setEmployeeData({
         ...employeeData,
@@ -58,6 +73,10 @@ const AddEmployee = () => {
     });
   };
 
+  /// <summary>
+  /// Handles changes in the "active" dropdown input field.
+  /// </summary>
+  /// <param name="option">The option chosen by the user</param>
   const handleActiveSelect = (option) => {
     setEmployeeData({
         ...employeeData,
@@ -65,6 +84,11 @@ const AddEmployee = () => {
     });
   };
 
+  /// <summary>
+  /// Prepares entered employee data by formatting it for the backend and sends
+  /// the data in a POST request to the backend. Handles response based on status code.
+  /// </summary>
+  /// <param name="e">Event to check if the form is empty</param>
   const handleSubmit = (e) => {
     e.preventDefault();
     

@@ -1,8 +1,6 @@
-import { render } from "@testing-library/react";
 import { useEffect, useState } from "react";
-import { Navigate, Link, useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import "./Dashboard.css"
-import AddEmployee from './AddEmployee';
 
 const Dashboard = () => {
   const [authenticated, setAuthenticated] = useState(
@@ -12,10 +10,12 @@ const Dashboard = () => {
   const [employeeData, setEmployeeData] = useState([]);
   const navigate = useNavigate();
   const [error, setError] = useState("");
-  const [showEmployeeTable, setShowEmployeeTable] = useState(true);
-  const [showAddForm, setShowAddForm] = useState(false);
-  const [showEditForm, setShowEditForm] = useState(false);
 
+  /// <summary>
+  /// Sends a request to the backend to delete an employee and handles
+  /// the response based on its status code.
+  /// </summary>
+  /// <param name="empID">ID of employee to delete</param>
   const handleDelete = (empID) => {
     console.log("handleDelete called with parameter: " + empID)
     console.log("body: " + JSON.stringify({ employeeID: empID }));
@@ -45,6 +45,9 @@ const Dashboard = () => {
     });
   };
 
+  /// <summary>
+  /// useEffect hook that calls function to get employees when page is loaded.
+  /// </summary>
   useEffect(() => {
     if (authenticated) {
       console.log("authenticated, value is: " + authenticated);
@@ -56,6 +59,10 @@ const Dashboard = () => {
     }
   }, []);
 
+  /// <summary>
+  /// Sends a GET request to the backend to get a list of employee details and
+  /// handles response based on status code. Called from useEffect hook.
+  /// </summary>
   const GetEmployees = () => {
     fetch("http://localhost:8000/api/Employees.php" + "?jwt=" + encodeURIComponent(jwt).replaceAll('%22',''))
       .then((res) => {
@@ -82,6 +89,10 @@ const Dashboard = () => {
       });
   }
 
+  /// <summary>
+  /// Resets items in session storage related to authentication and redirects
+  /// the user back to the login page. 
+  /// </summary>
   const Logout = () => {
     setAuthenticated(false);
     setJWT("");
@@ -97,7 +108,7 @@ const Dashboard = () => {
     return (
       <div className = "dashboard-container">
       <h3>Dashboard</h3>
-      {showEmployeeTable ? <table>
+      <table>
         <tbody>
         <tr>
           <th>Employee ID</th>
@@ -126,11 +137,10 @@ const Dashboard = () => {
           </tr>
         ))}
         </tbody>
-      </table> : null }
+      </table>
       <h1>{error}</h1>
-      {showAddForm ? <AddEmployee/> : null}
-      {showEmployeeTable ? <center><button className="dashboard-buttons" onClick={() => [setShowAddForm(true), setShowEmployeeTable(false)]}>Add new employee</button></center> : null } 
-      {showEmployeeTable ?<center><button className="dashboard-buttons" onClick={Logout}>Log Out</button></center> : null}
+      <center><button className="dashboard-buttons" onClick={() => navigate("/addEmployee")}>Add new employee</button></center>
+      <center><button className="dashboard-buttons" onClick={Logout}>Log Out</button></center>
       </div>
     );
   }

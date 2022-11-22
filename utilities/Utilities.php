@@ -1,14 +1,25 @@
 <?php
 
 class Utilities {
-    //Encodes a string to base 64
-    //Source: https://roytuts.com/how-to-generate-and-validate-jwt-using-php-without-using-third-party-api/
+    /// <summary>
+    /// Encodes a string to base64 that is safe to use in URLs.
+    /// </summary>
+    /// <param name="str">String to encode</param>
+    /// <returns>The base64 encoded from the string</returns>
+    ///  Source: https://roytuts.com/how-to-generate-and-validate-jwt-using-php-without-using-third-party-api/
     public static function base64url_encode($str) {
         return rtrim(strtr(base64_encode($str), '+/', '-_'), '=');
     }
 
-    //Generates and returns a jwt
-    //Source: https://roytuts.com/how-to-generate-and-validate-jwt-using-php-without-using-third-party-api/
+    /// <summary>
+    /// Generates a JSON Web Token (JWT) for the logged in user to be used 
+    /// for authentication.
+    /// </summary>
+    /// <param name="headers">The JWT headers</param>
+    /// <param name="payload">The JWT payload</param>
+    /// <param name="secret">The secret to be used (stored in a file outside of root)</param>
+    /// <returns>The JWT created using the headers, payload and secret</returns>
+    ///  Source: https://roytuts.com/how-to-generate-and-validate-jwt-using-php-without-using-third-party-api/
     public static function generate_jwt($headers, $payload, $secret) {
 	    $headers_encoded = self::base64url_encode(json_encode($headers));
 	
@@ -21,9 +32,15 @@ class Utilities {
 	
 	    return $jwt;
     }
-  
-    //Checks whether a JWT is valid
-    //Source: https://roytuts.com/how-to-generate-and-validate-jwt-using-php-without-using-third-party-api/
+
+    /// <summary>
+    /// Checks whether a JSON Web Token (JWT) is valid by checking its signature 
+    /// and expiry time.
+    /// </summary>
+    /// <param name="jwt">The JSON Web Token (JWT) to check</param>
+    /// <param name="secret">The secret to be used (stored in a file outside of root)</param>
+    /// <returns>False if the signature or expiry time is invalid, true otherwise</returns>
+    ///  Source: https://roytuts.com/how-to-generate-and-validate-jwt-using-php-without-using-third-party-api/
     public static function is_jwt_valid($jwt, $secret) {
         // split the jwt
         $tokenParts = explode('.', $jwt);
@@ -51,14 +68,24 @@ class Utilities {
         }
     }
 
-    //Takes in a uuid and turns it into 16 bytes binary form
-    //Source: qdev, https://stackoverflow.com/questions/2839037/php-mysql-storing-and-retrieving-uuids
+    /// <summary>
+    /// Takes in a universally unique identifier (UUID) and turns it into 
+    /// 16 byte binary form.
+    /// </summary>
+    /// <param name="uuid">The UUID to convert</param>
+    /// <returns>the 16 byte binary form of the UUID</returns>
+    /// Source: qdev, https://stackoverflow.com/questions/2839037/php-mysql-storing-and-retrieving-uuids
     public static function uuid_to_bin($uuid) {
         return pack("H*", str_replace('-', '', $uuid));
     }
   
-    //Takes in a 16 bytes binary value and turns it into uuid form
-    //Source: qdev, https://stackoverflow.com/questions/2839037/php-mysql-storing-and-retrieving-uuids
+    /// <summary>
+    /// Takes in a 16 byte binary value and turns it into a universally 
+    /// unique identifier (UUID)
+    /// </summary>
+    /// <param name="bin">The 16 byte binary value to convert</param>
+    /// <returns>The UUID form of the 16 byte binary value</returns>
+    /// Source: qdev, https://stackoverflow.com/questions/2839037/php-mysql-storing-and-retrieving-uuids
     public static function bin_to_uuid($bin) {
         return join("-", unpack("H8time_low/H4time_mid/H4time_hi/H4clock_seq_hi/H12clock_seq_low", $bin));
     }

@@ -10,7 +10,11 @@ $secret = $configDetails['secret'];
 
 $data = json_decode(file_get_contents("php://input"));
 
-//Takes in a skill level ID and returns the associated skill level name
+/// <summary>
+/// Takes in a skill level ID string and returns the associated skill level name.
+/// </summary>
+/// <param name="skillLevelID">The skill level ID</param>
+/// <returns>The skill name associated with the ID</returns>
 function determine_skill_Name($skillLevelID) {
   if($skillLevelID == "7cb03b1e-5c57-11") {
     return "Junior";
@@ -23,9 +27,13 @@ function determine_skill_Name($skillLevelID) {
   }  
 }
 
-//Takes in a string and returns yes or no depending on the string passed in
+/// <summary>
+/// Takes in a number and returns yes or no depending on the value.
+/// </summary>
+/// <param name="active">The number to check</param>
+/// <returns>"Yes" string if the value is "1", "No" otherwise</returns>
 function determine_active_status($active) {
-  if($active == "1") {
+  if($active == 1) {
     return "Yes";
   }
   else {

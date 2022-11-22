@@ -12,18 +12,33 @@ const Login = () => {
         sessionStorage.getItem("jwt") || "");
     const navigate = useNavigate();
 
+    /// <summary>
+    /// Handles changes in the username input field and sets the new username
+    /// if it doesn't exceed the character limit.
+    /// </summary>
+    /// <param name="e">Event to retrieve new value from</param>
     const handleUsernameChange = (e) => {
-        if(e.target.value.length <= 60) {
-          setUsername(e.target.value);
-        }
+      if(e.target.value.length <= 60) {
+        setUsername(e.target.value);
+      }
     };
 
+    /// <summary>
+    /// Handles changes in the password input field and sets the new password
+    /// if it doesn't exceed the character limit.
+    /// </summary>
+    /// <param name="e">Event to retrieve new value from</param>
     const handlePasswordChange = (e) => {
       if(e.target.value.length <= 60) {
         setPassword(e.target.value);
       }
     };
   
+    /// <summary>
+    /// Handles submission of the login form by sending the currently entered
+    /// username and password over to the backend in a POST request.
+    /// </summary>
+    /// <param name="e">Event to check if the form is empty</param>
     const handleSubmit = (e) => {
         e.preventDefault();
 

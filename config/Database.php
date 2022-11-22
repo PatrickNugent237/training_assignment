@@ -3,6 +3,11 @@
 class Database {
     private $con;
 
+    /// <summary>
+    /// Retrieves the database login details from an ini file stored outside of
+    /// the root folder and creates a connection to the database.
+    /// </summary>
+    /// <returns>The created database connection</returns>
     public static function get_database_connection() {
         try {
             $configDetails = parse_ini_file('../../config.ini');
