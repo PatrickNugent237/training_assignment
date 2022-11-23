@@ -52,7 +52,7 @@ const Dashboard = () => {
     })
     .then((data) => {
       console.log("employee deleted successfully with response: " + data);
-      GetEmployees();
+      getEmployees();
     })
     .catch((error) => {
       console.log(error);
@@ -65,7 +65,7 @@ const Dashboard = () => {
   useEffect(() => {
     if (authenticated) {
       console.log("authenticated, value is: " + authenticated);
-      GetEmployees();
+      getEmployees();
     }
     else {
       console.log("not authenticated, value is: " + authenticated);
@@ -77,7 +77,7 @@ const Dashboard = () => {
   /// Sends a GET request to the backend to get a list of employee details and
   /// handles response based on status code. Called from useEffect hook.
   /// </summary>
-  const GetEmployees = () => {
+  const getEmployees = () => {
     fetch("http://localhost:8000/api/Employees.php" + "?jwt=" + encodeURIComponent(jwt).replaceAll('%22',''))
       .then((res) => {
         //res.json()
@@ -107,7 +107,7 @@ const Dashboard = () => {
   /// Resets items in session storage related to authentication and redirects
   /// the user back to the login page. 
   /// </summary>
-  const Logout = () => {
+  const logout = () => {
     setAuthenticated(false);
     setJWT("");
     sessionStorage.setItem("authenticated", false);
@@ -116,9 +116,15 @@ const Dashboard = () => {
   }
 
   /// <summary>
-  /// 
+  /// Shows the employee form and hides the employee table. Sets the details to be
+  /// edited by the EmployeeForm component.
   /// </summary>
-  const ShowEmployeeForm = (details, request) => {
+  /// <param name="details">The details of the employee in the current row (if editing)
+  /// or an empty employee details object (if adding)</param>
+  /// <param name="request">The request type to send to the EmployeeForm component. 
+  /// "PUT" if the edit button was pressed or "POST" if the add button was pressed</param>
+  /// </param>
+  const showEmployeeForm = (details, request) => {
 
     setDetailsToEdit({
       ...detailsToEdit,
@@ -137,9 +143,9 @@ const Dashboard = () => {
   }
 
   /// <summary>
-  /// 
+  /// Shows the employee table and hides the employee form.
   /// </summary>
-  const ShowEmployeeTable = () => {
+  const showEmployeeTable = () => {
     setEmployeeTableVisible(true);
     setEmployeeFormVisible(false);
   }
@@ -174,7 +180,7 @@ const Dashboard = () => {
             <td>{item.skillLevel}</td>
             <td>{item.active}</td>
             <td>{item.age}</td>
-            <td><button onClick={() => ShowEmployeeForm(item, "PUT") }>Edit</button>
+            <td><button onClick={() => showEmployeeForm(item, "PUT") }>Edit</button>
             <button onClick={() => handleDelete(item.employeeID)}>Delete</button>
             </td>
           </tr>
@@ -182,12 +188,12 @@ const Dashboard = () => {
         </tbody>
       </table> : null}
       <h1>{error}</h1>
-      {employeeTableVisible ? <center><button className="dashboard-buttons" onClick={() => ShowEmployeeForm(detailsToEdit, "POST")}>Add new employee</button></center> : null}
-      {employeeTableVisible ? <center><button className="dashboard-buttons" onClick={Logout}>Log Out</button></center> : null}
+      {employeeTableVisible ? <center><button className="dashboard-buttons" onClick={() => showEmployeeForm(detailsToEdit, "POST")}>Add new employee</button></center> : null}
+      {employeeTableVisible ? <center><button className="dashboard-buttons" onClick={logout}>Log Out</button></center> : null}
 
       {employeeFormVisible ? <div className="employee-form">
       <EmployeeForm detailsToEdit={detailsToEdit}/>
-      <button onClick={() => ShowEmployeeTable()}>Cancel</button>
+      <button onClick={() => showEmployeeTable()}>Cancel</button>
       </div> : null}
       </div>
     );

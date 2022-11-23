@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Navigate, useNavigate, useLocation } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { format } from 'date-fns'
 import Dropdown from 'react-dropdown';
 import 'react-dropdown/style.css';
@@ -7,7 +7,7 @@ import "./EmployeeForm.css"
 
 export default function EmployeeForm({detailsToEdit}){
   const [error, setError] = useState("");
-  const [authenticated, setAuthenticated] = useState(
+  const [authenticated] = useState(
     sessionStorage.getItem("authenticated") || false);
   const [jwt] = useState(
     sessionStorage.getItem("jwt") || "");
@@ -139,14 +139,6 @@ export default function EmployeeForm({detailsToEdit}){
       console.log(error);
     });
   };
-
-  /// <summary>
-  /// useEffect hook that sets employee data to be edited (if any was sent) 
-  /// when the page is loaded.
-  /// </summary>
-  useEffect(() => {
-    
-  }, []);
 
   if (!authenticated) {
     return <Navigate replace to="/login" />;
