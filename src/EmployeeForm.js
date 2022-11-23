@@ -5,13 +5,12 @@ import Dropdown from 'react-dropdown';
 import 'react-dropdown/style.css';
 import "./EmployeeForm.css"
 
-export default function EditEmployee({detailsToEdit}){
+export default function EmployeeForm({detailsToEdit}){
   const [error, setError] = useState("");
   const [authenticated, setAuthenticated] = useState(
     sessionStorage.getItem("authenticated") || false);
   const [jwt] = useState(
     sessionStorage.getItem("jwt") || "");
-  const location = useLocation() || "";
   const [employeeData, setEmployeeData] = useState({
     employeeID: detailsToEdit.employeeID,
     firstName: detailsToEdit.firstName,
@@ -20,7 +19,8 @@ export default function EditEmployee({detailsToEdit}){
     email: detailsToEdit.email,
     skillLevel: detailsToEdit.skillLevel,
     active: detailsToEdit.active,
-    age: detailsToEdit.age
+    age: detailsToEdit.age,
+    requestType: detailsToEdit.requestType
   });
   const navigate = useNavigate();
 
@@ -111,7 +111,7 @@ export default function EditEmployee({detailsToEdit}){
     }
 
     fetch("http://localhost:8000/api/Employees.php/" + employeeData.employeeID, {
-      method: 'PUT',
+      method: employeeData.requestType,
       body: JSON.stringify({ employeeID: employeeData.employeeID,
         firstName: employeeData.firstName, lastName: employeeData.lastName,
         dob: employeeData.dob, email: employeeData.email, 
@@ -132,7 +132,8 @@ export default function EditEmployee({detailsToEdit}){
       }
     })
     .then(() => {
-      window.location.reload(false);
+      //window.location.reload(false);
+      navigate(0);
     })
     .catch((error) => {
       console.log(error);
@@ -144,9 +145,7 @@ export default function EditEmployee({detailsToEdit}){
   /// when the page is loaded.
   /// </summary>
   useEffect(() => {
-    if(location.state != null) {
-      setEmployeeData(location.state.employeeData);
-    }
+    
   }, []);
 
   if (!authenticated) {
@@ -230,5 +229,3 @@ export default function EditEmployee({detailsToEdit}){
     );
 }
 }
-
-//export default EditEmployee;

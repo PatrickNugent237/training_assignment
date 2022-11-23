@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import "./Dashboard.css"
-import EditEmployee from './EditEmployee';
-import AddEmployee from './AddEmployee';
+import EmployeeForm from './EmployeeForm';
 
 const Dashboard = () => {
   const [authenticated, setAuthenticated] = useState(
@@ -12,10 +11,19 @@ const Dashboard = () => {
   const [employeeData, setEmployeeData] = useState([]);
   const navigate = useNavigate();
   const [error, setError] = useState("");
-  const [detailsToEdit, setDetailsToEdit] = useState([]);
+  const [detailsToEdit, setDetailsToEdit] = useState({
+    employeeID: "",
+    firstName: "",
+    lastName: "",
+    dob: "",
+    email: "",
+    skillLevel: "",
+    active: "",
+    age: "",
+    requestType: ""
+  });
   const [employeeTableVisible, setEmployeeTableVisible] = useState(true);
-  const [editFormVisible, setEditFormVisible] = useState(false);
-  //const [addFormVisible, setAddFormVisible] = useState(false);
+  const [employeeFormVisible, setEmployeeFormVisible] = useState(false);
 
   /// <summary>
   /// Sends a request to the backend to delete an employee and handles
@@ -110,10 +118,22 @@ const Dashboard = () => {
   /// <summary>
   /// 
   /// </summary>
-  const ShowEditForm = (details) => {
-    setDetailsToEdit(details);
+  const ShowEmployeeForm = (details, request) => {
+
+    setDetailsToEdit({
+      ...detailsToEdit,
+      employeeID: details.employeeID,
+      firstName: details.firstName,
+      lastName: details.lastName,
+      dob: details.dob,
+      email: details.email,
+      skillLevel: details.skillLevel,
+      active: details.active,
+      age: details.age,
+      requestType: request
+    });
     setEmployeeTableVisible(false);
-    setEditFormVisible(true);
+    setEmployeeFormVisible(true);
   }
 
   /// <summary>
@@ -121,7 +141,7 @@ const Dashboard = () => {
   /// </summary>
   const ShowEmployeeTable = () => {
     setEmployeeTableVisible(true);
-    setEditFormVisible(false);
+    setEmployeeFormVisible(false);
   }
 
   if (!authenticated) {
@@ -154,7 +174,7 @@ const Dashboard = () => {
             <td>{item.skillLevel}</td>
             <td>{item.active}</td>
             <td>{item.age}</td>
-            <td><button onClick={() => ShowEditForm(item) }>Edit</button>
+            <td><button onClick={() => ShowEmployeeForm(item, "PUT") }>Edit</button>
             <button onClick={() => handleDelete(item.employeeID)}>Delete</button>
             </td>
           </tr>
@@ -162,11 +182,11 @@ const Dashboard = () => {
         </tbody>
       </table> : null}
       <h1>{error}</h1>
-      {employeeTableVisible ? <center><button className="dashboard-buttons" onClick={() => navigate("/addEmployee")}>Add new employee</button></center> : null}
+      {employeeTableVisible ? <center><button className="dashboard-buttons" onClick={() => ShowEmployeeForm(detailsToEdit, "POST")}>Add new employee</button></center> : null}
       {employeeTableVisible ? <center><button className="dashboard-buttons" onClick={Logout}>Log Out</button></center> : null}
 
-      {editFormVisible ? <div className="employee-form">
-      <EditEmployee detailsToEdit={detailsToEdit}/>
+      {employeeFormVisible ? <div className="employee-form">
+      <EmployeeForm detailsToEdit={detailsToEdit}/>
       <button onClick={() => ShowEmployeeTable()}>Cancel</button>
       </div> : null}
       </div>

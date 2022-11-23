@@ -4,8 +4,6 @@ import './index.css';
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Login from "./Login";
 import Dashboard from "./Dashboard";
-import EditEmployee from './EditEmployee';
-import AddEmployee from './AddEmployee';
 import reportWebVitals from './reportWebVitals';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
@@ -16,8 +14,6 @@ root.render(
         <Route index element={<Login />} />
         <Route path="login" element={<Login />} />
         <Route path="dashboard" element={<Dashboard />} />
-        <Route path="editEmployee" element={<EditEmployee />} />
-        <Route path="addEmployee" element={<AddEmployee />} />
       </Routes>
     </BrowserRouter>
   /*</React.StrictMode>*/
