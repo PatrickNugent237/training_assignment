@@ -116,6 +116,9 @@ const Dashboard = () => {
     setEditFormVisible(true);
   }
 
+  /// <summary>
+  /// 
+  /// </summary>
   const ShowEmployeeTable = () => {
     setEmployeeTableVisible(true);
     setEditFormVisible(false);
