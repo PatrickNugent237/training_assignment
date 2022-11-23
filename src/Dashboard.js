@@ -108,13 +108,17 @@ const Dashboard = () => {
   }
 
   /// <summary>
-  /// Resets items in session storage related to authentication and redirects
-  /// the user back to the login page. 
+  /// 
   /// </summary>
   const ShowEditForm = (details) => {
     setDetailsToEdit(details);
     setEmployeeTableVisible(false);
     setEditFormVisible(true);
+  }
+
+  const ShowEmployeeTable = () => {
+    setEmployeeTableVisible(true);
+    setEditFormVisible(false);
   }
 
   if (!authenticated) {
@@ -155,9 +159,13 @@ const Dashboard = () => {
         </tbody>
       </table> : null}
       <h1>{error}</h1>
-      {editFormVisible ? <EditEmployee detailsToEdit={detailsToEdit}/> : null}
-      <center><button className="dashboard-buttons" onClick={() => navigate("/addEmployee")}>Add new employee</button></center>
-      <center><button className="dashboard-buttons" onClick={Logout}>Log Out</button></center>
+      {employeeTableVisible ? <center><button className="dashboard-buttons" onClick={() => navigate("/addEmployee")}>Add new employee</button></center> : null}
+      {employeeTableVisible ? <center><button className="dashboard-buttons" onClick={Logout}>Log Out</button></center> : null}
+
+      {editFormVisible ? <div className="employee-form">
+      <EditEmployee detailsToEdit={detailsToEdit}/>
+      <button onClick={() => ShowEmployeeTable()}>Cancel</button>
+      </div> : null}
       </div>
     );
   }

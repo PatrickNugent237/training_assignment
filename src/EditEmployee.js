@@ -157,8 +157,7 @@ export default function EditEmployee({detailsToEdit}){
   }
   else {
     return (
-      <div className="employee-container">
-        <div className="employee-form">
+      <div>
         <h3>Edit Employee Details</h3>
         <form
             method="put"
@@ -226,9 +225,7 @@ export default function EditEmployee({detailsToEdit}){
             <br />
             <button type="submit">Submit</button>
         </form>
-        <button onClick={() => navigate("/dashboard")}>Back to Dashboard</button>
         <h1>{error}</h1>
-        </div>
       </div>
     );
 }
