@@ -5,9 +5,12 @@ header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
 include_once '../config/Database.php';
 include_once '../utilities/Utilities.php';
 
+// Retrieve the secret for use in creating/validating JSON Web Tokens. 
+// For security reasons, this is stored in a file outside of the project root.
 $configDetails = parse_ini_file('../../config.ini');
 $secret = $configDetails['secret'];
 
+// Retrieve any data that might have been sent as part of a request
 $data = json_decode(file_get_contents("php://input"));
 
 /// <summary>
@@ -41,15 +44,20 @@ function determine_active_status($active) {
   }
 }
 
+// Switch statement to handle requests differently based on the request
+// method found (GET, POST, PUT, DELETE)
 switch($_SERVER['REQUEST_METHOD']) {
   case 'GET':
     $jwt = $_GET['jwt'];
 
     $redis = new Redis();
 
+    // Try connecting to the Redis server
     try {
       $redis->connect('127.0.0.1', 6379);
 
+      // If the key (user's JWT) was found in the cache, just return the value
+      // (employee data in this case)
       if ($redis->get($jwt)) {
         $employees = unserialize($redis->get($jwt)); 
         http_response_code(200);
@@ -60,16 +68,17 @@ switch($_SERVER['REQUEST_METHOD']) {
     catch(RedisException $re) {
     }
 
+    // Check if user's JWT is valid
     if(Utilities::is_jwt_valid($jwt, $secret)) {
       $sql = "SELECT * FROM `employees` WHERE 1";
 
-      // run SQL statement
+      // Run SQL statement
       $con = Database::get_database_connection();
       $result = mysqli_query($con ,$sql);
 
       $con->close();
 
-      // die if SQL statement failed
+      // Die if SQL statement failed
       if (!$result) {
         http_response_code(404);
         die(mysqli_error($con));
@@ -82,6 +91,8 @@ switch($_SERVER['REQUEST_METHOD']) {
           echo "No results!";
         } 
         else {
+          // Go through all of the rows from the query result and extract the
+          // data from each row into a json array.
           do {
             $empId = $rows['EmployeeID'];
             $firstName = $rows['FirstName'];
@@ -105,6 +116,8 @@ switch($_SERVER['REQUEST_METHOD']) {
           } while ($rows = mysqli_fetch_assoc($result));
         }
 
+        // As this request was not found in the cache, try sending the key (user's JWT)
+        // and value (employee data) to the Redis cache
         try {
           $redis->set($jwt, serialize($resultJson));
           $redis->expire($jwt, 10);
@@ -132,13 +145,13 @@ switch($_SERVER['REQUEST_METHOD']) {
       $active = $data->active;
       $age = $data->age;
 
-      //Calculate current age from date of birth and current date
+      // Calculate current age from date of birth and current date
       $currentDate = new DateTime("now");
       $birthDate = new DateTime($dob);
       $age = $birthDate->diff($currentDate)->y;
 
-      //Generate a GUID to use as the employee ID
-      //Source: Michel Ayres, https://stackoverflow.com/questions/21671179/how-to-generate-a-new-guid
+      // Generate a GUID to use as the employee ID
+      // Source: Michel Ayres, https://stackoverflow.com/questions/21671179/how-to-generate-a-new-guid
       $employeeID = sprintf('%04X%04X-%04X-%04X-%04X-%04X%04X%04X', mt_rand(0, 65535), 
         mt_rand(0, 65535), mt_rand(0, 65535), mt_rand(16384, 20479), 
         mt_rand(32768, 49151), mt_rand(0, 65535), mt_rand(0, 65535), 
@@ -155,7 +168,7 @@ switch($_SERVER['REQUEST_METHOD']) {
       $con->close();
 
       if (!$result) {
-        http_response_code(401);
+        http_response_code(404);
         die(mysqli_error($con));
       }
       else {  
@@ -179,7 +192,7 @@ switch($_SERVER['REQUEST_METHOD']) {
       $active = $data->active;
       $age = $data->age;
 
-      //Calculate current age from date of birth and current date
+      // Calculate current age from date of birth and current date
       $currentDate = new DateTime("now");
       $birthDate = new DateTime($dob);
       $age = $birthDate->diff($currentDate)->y;
@@ -211,13 +224,13 @@ switch($_SERVER['REQUEST_METHOD']) {
       $employeeID = Utilities::uuid_to_bin($data->employeeID);
       $sql = "DELETE FROM `employees` WHERE employeeID='$employeeID'";
 
-      // run SQL statement
+      // Run SQL statement
       $con = Database::get_database_connection();
       $result = mysqli_query($con,$sql);
 
       $con->close();
 
-      // die if SQL statement failed
+      // Die if SQL statement failed
       if (!$result) {
         http_response_code(401);
         die(mysqli_error($con));

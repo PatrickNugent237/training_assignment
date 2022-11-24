@@ -6,11 +6,14 @@ header('Content-Type: application/json');
 include_once '../config/Database.php';
 include_once '../utilities/Utilities.php';
 
+// Retrieve the secret for use in creating/validating JSON Web Tokens. 
+// For security reasons, this is stored in a file outside of the project root.
 $configDetails = parse_ini_file('../../config.ini');
 $secret = $configDetails['secret'];
 
 $con = Database::get_database_connection();
 
+// Retrieve any data that might have been sent as part of a request
 $data = json_decode(file_get_contents("php://input"));
 
 $username = $data->username;
@@ -18,10 +21,10 @@ $password = $data->password;
 
 $sql = "SELECT * FROM `users` WHERE username='$username'";
 
-// run SQL statement
+// Run SQL statement
 $result = mysqli_query($con,$sql);
 
-// die if SQL statement failed
+// Die if SQL statement failed
 if (!$result) {
   http_response_code(404);
   die(mysqli_error($con));

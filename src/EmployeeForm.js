@@ -1,29 +1,31 @@
 import { useEffect, useState } from "react";
-import { Navigate, useNavigate, useLocation } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { format } from 'date-fns'
 import Dropdown from 'react-dropdown';
 import 'react-dropdown/style.css';
 import "./EmployeeForm.css"
 
-const AddEmployee = () => {    
+export default function EmployeeForm({detailsToEdit}){
   const [error, setError] = useState("");
   const [authenticated] = useState(
-    sessionStorage.getItem("authenticated")|| false);
+    sessionStorage.getItem("authenticated") || false);
   const [jwt] = useState(
     sessionStorage.getItem("jwt") || "");
   const [employeeData, setEmployeeData] = useState({
-    firstName: "",
-    lastName: "",
-    dob: "",
-    email: "",
-    skillLevel: "",
-    active: "",
-    age: ""
+    employeeID: detailsToEdit.employeeID,
+    firstName: detailsToEdit.firstName,
+    lastName: detailsToEdit.lastName,
+    dob: detailsToEdit.dob,
+    email: detailsToEdit.email,
+    skillLevel: detailsToEdit.skillLevel,
+    active: detailsToEdit.active,
+    age: detailsToEdit.age,
+    requestType: detailsToEdit.requestType
   });
   const navigate = useNavigate();
 
   /// <summary>
-  /// Handles changes in most of the input fields in the form for adding
+  /// Handles changes in most of the input fields in the form for editing
   /// employees. Sets the new value in EmployeeData based on the name and 
   /// value retrieved from the event.
   /// </summary>
@@ -32,10 +34,8 @@ const AddEmployee = () => {
     const name = e.target.name;
     const value = e.target.value;
 
-    console.log("handling change with value of: " +  value + " and name of: " + name);
-    console.log("first name: " + employeeData.firstName);
-
-    if(value.length <=60) {
+    // Only set if character length is less than 60
+    if(value.length <=60){
       setEmployeeData({
         ...employeeData,
         [name]: value
@@ -54,6 +54,7 @@ const AddEmployee = () => {
 
     console.log(currentDate);
 
+    // Only set if date of birth is before than the current date
     if(value < currentDate) {
       setEmployeeData({
         ...employeeData,
@@ -94,35 +95,35 @@ const AddEmployee = () => {
     
     var skillLevelID, active;
 
-    if(employeeData.skillLevel == "Senior") {
+    // Determine the skill level ID to send from name
+    if(employeeData.skillLevel === "Senior") {
         skillLevelID = "995112f0-5c57-11";
     }
-    else if(employeeData.skillLevel == "Mid-level") {
+    else if(employeeData.skillLevel === "Mid-level") {
         skillLevelID = "8dc2281d-5c57-11";
     }
     else {
         skillLevelID = "7cb03b1e-5c57-11";
     }
 
-    if(employeeData.active == "Yes") {
+    // Format active status as a number
+    if(employeeData.active === "Yes") {
       active = "1";
     }
     else {
       active = "0";
     }
 
-    fetch("http://localhost:8000/api/Employees.php", {
-      method: 'POST',
+    fetch("http://localhost:8000/api/Employees.php/" + employeeData.employeeID, {
+      method: employeeData.requestType,
       body: JSON.stringify({ employeeID: employeeData.employeeID,
         firstName: employeeData.firstName, lastName: employeeData.lastName,
         dob: employeeData.dob, email: employeeData.email, 
         skillLevelID: skillLevelID, active: active,
-        age: employeeData.age, jwt: jwt 
+        age: employeeData.age, jwt: jwt
       })
     }).then((res) => {
       if(res.status === 200) {
-        //console.log(res);
-        return res.json();
       }
       else if(res.status === 401) {
         setError("Error: failed to authenticate");
@@ -133,9 +134,8 @@ const AddEmployee = () => {
         throw new Error("Error: Failed to add employee");
       }
     })
-    .then((data) => {
-      console.log("Employee added with ID: " + data);
-      navigate("/dashboard");
+    .then(() => {
+      navigate(0);
     })
     .catch((error) => {
       console.log(error);
@@ -145,13 +145,15 @@ const AddEmployee = () => {
   if (!authenticated) {
     return <Navigate replace to="/login" />;
   } 
+  else if(detailsToEdit === null) {
+    return <Navigate replace to="/dashboard" />;
+  }
   else {
     return (
-      <div className="employee-container">
-        <div className="employee-form">
-        <h3>Add New Employee</h3>
+      <div>
+        <h3>Edit Employee Details</h3>
         <form
-            method="post"
+            method="put"
             onSubmit={(event) => handleSubmit(event)}
         >
             <label htmlFor="firstName">First Name: </label>
@@ -216,12 +218,8 @@ const AddEmployee = () => {
             <br />
             <button type="submit">Submit</button>
         </form>
-        <button onClick={() => navigate("/dashboard")}>Back to Dashboard</button>
         <h1>{error}</h1>
-        </div>
       </div>
     );
-  }
 }
-
-export default AddEmployee;
+}

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import "./Dashboard.css"
+import EmployeeForm from './EmployeeForm';
 
 const Dashboard = () => {
   const [authenticated, setAuthenticated] = useState(
@@ -10,6 +11,19 @@ const Dashboard = () => {
   const [employeeData, setEmployeeData] = useState([]);
   const navigate = useNavigate();
   const [error, setError] = useState("");
+  const [detailsToEdit, setDetailsToEdit] = useState({
+    employeeID: "",
+    firstName: "",
+    lastName: "",
+    dob: "",
+    email: "",
+    skillLevel: "",
+    active: "",
+    age: "",
+    requestType: ""
+  });
+  const [employeeTableVisible, setEmployeeTableVisible] = useState(true);
+  const [employeeFormVisible, setEmployeeFormVisible] = useState(false);
 
   /// <summary>
   /// Sends a request to the backend to delete an employee and handles
@@ -38,7 +52,7 @@ const Dashboard = () => {
     })
     .then((data) => {
       console.log("employee deleted successfully with response: " + data);
-      GetEmployees();
+      getEmployees();
     })
     .catch((error) => {
       console.log(error);
@@ -49,9 +63,9 @@ const Dashboard = () => {
   /// useEffect hook that calls function to get employees when page is loaded.
   /// </summary>
   useEffect(() => {
-    if (authenticated) {
+    if (authenticated == "true") {
       console.log("authenticated, value is: " + authenticated);
-      GetEmployees();
+      getEmployees();
     }
     else {
       console.log("not authenticated, value is: " + authenticated);
@@ -63,17 +77,15 @@ const Dashboard = () => {
   /// Sends a GET request to the backend to get a list of employee details and
   /// handles response based on status code. Called from useEffect hook.
   /// </summary>
-  const GetEmployees = () => {
+  const getEmployees = () => {
     fetch("http://localhost:8000/api/Employees.php" + "?jwt=" + encodeURIComponent(jwt).replaceAll('%22',''))
       .then((res) => {
-        //res.json()
         if(res.status === 200) {
           return res.json();     
         }
         else if(res.status === 401) {
           setError("Failed to get list of employees: authentication failed");
           throw new Error("Failed to get list of employees: authentication failed");
-          //throw new Error(res.status);
         }
         else if(!res.ok) {
           setError("Error: Failed to get list of employees");
@@ -93,12 +105,48 @@ const Dashboard = () => {
   /// Resets items in session storage related to authentication and redirects
   /// the user back to the login page. 
   /// </summary>
-  const Logout = () => {
+  const logout = () => {
+    //sessionStorage.clear()
     setAuthenticated(false);
     setJWT("");
     sessionStorage.setItem("authenticated", false);
     sessionStorage.setItem("jwt", "");
     return <Navigate replace to="/login" />;
+  }
+
+  /// <summary>
+  /// Shows the employee form and hides the employee table. Sets the details to be
+  /// edited by the EmployeeForm component.
+  /// </summary>
+  /// <param name="details">The details of the employee in the current row (if editing)
+  /// or an empty employee details object (if adding)</param>
+  /// <param name="request">The request type to send to the EmployeeForm component. 
+  /// "PUT" if the edit button was pressed or "POST" if the add button was pressed</param>
+  /// </param>
+  const showEmployeeForm = (details, request) => {
+
+    setDetailsToEdit({
+      ...detailsToEdit,
+      employeeID: details.employeeID,
+      firstName: details.firstName,
+      lastName: details.lastName,
+      dob: details.dob,
+      email: details.email,
+      skillLevel: details.skillLevel,
+      active: details.active,
+      age: details.age,
+      requestType: request
+    });
+    setEmployeeTableVisible(false);
+    setEmployeeFormVisible(true);
+  }
+
+  /// <summary>
+  /// Shows the employee table and hides the employee form.
+  /// </summary>
+  const showEmployeeTable = () => {
+    setEmployeeTableVisible(true);
+    setEmployeeFormVisible(false);
   }
 
   if (!authenticated) {
@@ -108,7 +156,7 @@ const Dashboard = () => {
     return (
       <div className = "dashboard-container">
       <h3>Dashboard</h3>
-      <table>
+      {employeeTableVisible ? <table>
         <tbody>
         <tr>
           <th>Employee ID</th>
@@ -131,16 +179,21 @@ const Dashboard = () => {
             <td>{item.skillLevel}</td>
             <td>{item.active}</td>
             <td>{item.age}</td>
-            <td><button onClick={() => navigate("/editEmployee", { state: { employeeData: item } })}>Edit</button>
+            <td><button onClick={() => showEmployeeForm(item, "PUT") }>Edit</button>
             <button onClick={() => handleDelete(item.employeeID)}>Delete</button>
             </td>
           </tr>
         ))}
         </tbody>
-      </table>
+      </table> : null}
       <h1>{error}</h1>
-      <center><button className="dashboard-buttons" onClick={() => navigate("/addEmployee")}>Add new employee</button></center>
-      <center><button className="dashboard-buttons" onClick={Logout}>Log Out</button></center>
+      {employeeTableVisible ? <center><button className="dashboard-buttons" onClick={() => showEmployeeForm(detailsToEdit, "POST")}>Add new employee</button></center> : null}
+      {employeeTableVisible ? <center><button className="dashboard-buttons" onClick={logout}>Log Out</button></center> : null}
+
+      {employeeFormVisible ? <div className="employee-form">
+      <EmployeeForm detailsToEdit={detailsToEdit}/>
+      <button onClick={() => showEmployeeTable()}>Cancel</button>
+      </div> : null}
       </div>
     );
   }
