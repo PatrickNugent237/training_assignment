@@ -34,6 +34,7 @@ export default function EmployeeForm({detailsToEdit}){
     const name = e.target.name;
     const value = e.target.value;
 
+    // Only set if character length is less than 60
     if(value.length <=60){
       setEmployeeData({
         ...employeeData,
@@ -53,6 +54,7 @@ export default function EmployeeForm({detailsToEdit}){
 
     console.log(currentDate);
 
+    // Only set if date of birth is before than the current date
     if(value < currentDate) {
       setEmployeeData({
         ...employeeData,
@@ -93,6 +95,7 @@ export default function EmployeeForm({detailsToEdit}){
     
     var skillLevelID, active;
 
+    // Determine the skill level ID to send from name
     if(employeeData.skillLevel === "Senior") {
         skillLevelID = "995112f0-5c57-11";
     }
@@ -103,6 +106,7 @@ export default function EmployeeForm({detailsToEdit}){
         skillLevelID = "7cb03b1e-5c57-11";
     }
 
+    // Format active status as a number
     if(employeeData.active === "Yes") {
       active = "1";
     }
@@ -120,7 +124,6 @@ export default function EmployeeForm({detailsToEdit}){
       })
     }).then((res) => {
       if(res.status === 200) {
-        //return res.json();
       }
       else if(res.status === 401) {
         setError("Error: failed to authenticate");
@@ -132,7 +135,6 @@ export default function EmployeeForm({detailsToEdit}){
       }
     })
     .then(() => {
-      //window.location.reload(false);
       navigate(0);
     })
     .catch((error) => {

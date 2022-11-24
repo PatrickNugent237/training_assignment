@@ -63,7 +63,7 @@ const Dashboard = () => {
   /// useEffect hook that calls function to get employees when page is loaded.
   /// </summary>
   useEffect(() => {
-    if (authenticated) {
+    if (authenticated == "true") {
       console.log("authenticated, value is: " + authenticated);
       getEmployees();
     }
@@ -80,14 +80,12 @@ const Dashboard = () => {
   const getEmployees = () => {
     fetch("http://localhost:8000/api/Employees.php" + "?jwt=" + encodeURIComponent(jwt).replaceAll('%22',''))
       .then((res) => {
-        //res.json()
         if(res.status === 200) {
           return res.json();     
         }
         else if(res.status === 401) {
           setError("Failed to get list of employees: authentication failed");
           throw new Error("Failed to get list of employees: authentication failed");
-          //throw new Error(res.status);
         }
         else if(!res.ok) {
           setError("Error: Failed to get list of employees");
@@ -108,6 +106,7 @@ const Dashboard = () => {
   /// the user back to the login page. 
   /// </summary>
   const logout = () => {
+    //sessionStorage.clear()
     setAuthenticated(false);
     setJWT("");
     sessionStorage.setItem("authenticated", false);
