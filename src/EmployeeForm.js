@@ -108,10 +108,10 @@ export default function EmployeeForm({detailsToEdit}){
 
     // Format active status as a number
     if(employeeData.active === "Yes") {
-      active = "1";
+      active = 1;
     }
     else {
-      active = "0";
+      active = 0;
     }
 
     fetch("http://localhost:8000/api/Employees.php/" + employeeData.employeeID, {
@@ -135,6 +135,7 @@ export default function EmployeeForm({detailsToEdit}){
       }
     })
     .then(() => {
+      //console.log("mysqli error: " + data);
       navigate(0);
     })
     .catch((error) => {

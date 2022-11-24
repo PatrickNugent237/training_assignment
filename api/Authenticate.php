@@ -19,15 +19,16 @@ $data = json_decode(file_get_contents("php://input"));
 $username = $data->username;
 $password = $data->password;
 
-$sql = "SELECT * FROM `users` WHERE username='$username'";
-
-// Run SQL statement
-$result = mysqli_query($con,$sql);
+// Prepare and run SQL statement
+$stmt = $con->prepare("SELECT * FROM `users` WHERE username=?");
+$stmt->execute([$username]);
+$stmt->execute();
+$result = $stmt->get_result();
 
 // Die if SQL statement failed
 if (!$result) {
   http_response_code(404);
-  die(mysqli_error($con));
+  die(mysqli_error($result));
 }
 
 $foundUser = mysqli_fetch_object($result);
@@ -46,7 +47,6 @@ if($foundUser != NULL) {
     }
     else {
       http_response_code(401);
-      echo json_encode("Invalid token generated");
     }
   } 
   else {
@@ -59,6 +59,7 @@ else {
   http_response_code(401);
 }
 
+$stmt->close();
 $con->close();
 
 ?>

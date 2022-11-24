@@ -76,12 +76,11 @@ switch($_SERVER['REQUEST_METHOD']) {
       $con = Database::get_database_connection();
       $result = mysqli_query($con ,$sql);
 
-      $con->close();
-
       // Die if SQL statement failed
       if (!$result) {
         http_response_code(404);
         die(mysqli_error($con));
+        $con->close();
       }
       else {  
         $resultJson = array("data" => array());
@@ -159,15 +158,16 @@ switch($_SERVER['REQUEST_METHOD']) {
 
       $employeeBinID = Utilities::uuid_to_bin($employeeID);
 
-      $sql = "INSERT INTO `employees` (EmployeeID, FirstName, LastName, DOB, Email, SkillLevelID, Active, Age) 
-        VALUES ('$employeeBinID', '$firstName', '$lastName', '$dob', '$email', '$skillLevelID', '$active', '$age')";
-
       $con = Database::get_database_connection();
-      $result = mysqli_query($con,$sql);
 
-      $con->close();
+      // Prepare and run SQL statement
+      $stmt = $con->prepare("INSERT INTO `employees` (EmployeeID, FirstName, LastName, 
+        DOB, Email, SkillLevelID, Active, Age) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+      $stmt->bind_param("ssssssii", $employeeBinID, $firstName, $lastName, $dob, $email,
+        $skillLevelID, $active, $age);
 
-      if (!$result) {
+      if (!$stmt->execute()) {
         http_response_code(404);
         die(mysqli_error($con));
       }
@@ -175,6 +175,9 @@ switch($_SERVER['REQUEST_METHOD']) {
         http_response_code(200);
         echo json_encode($employeeID);
       }
+
+      $stmt->close();
+      $con->close();
     }
     else {
       http_response_code(401);
@@ -197,22 +200,25 @@ switch($_SERVER['REQUEST_METHOD']) {
       $birthDate = new DateTime($dob);
       $age = $birthDate->diff($currentDate)->y;
 
-      $sql = "UPDATE `Employees` SET firstName='$firstName', lastName='$lastName',
-        dob='$dob', email='$email', skillLevelID='$skillLevelID', active='$active',
-        age='$age' WHERE employeeID='$employeeID'";
-
       $con = Database::get_database_connection();
-      $result = mysqli_query($con,$sql);
 
-      $con->close();
-
-      if (!$result) {
-        http_response_code(401);
+      // Prepare and run SQL statement
+      $stmt = $con->prepare("UPDATE `Employees` SET firstName=?, lastName=?,
+        dob=?, email=?, skillLevelID=?, active=?,
+        age=? WHERE employeeID=?");
+      $stmt->bind_param("sssssiis", $firstName, $lastName, $dob, $email, $skillLevelID,
+        $active, $age, $employeeID);
+            
+      if (!$stmt->execute()) {
+        http_response_code(404);
         die(mysqli_error($con));
       }
       else{  
         http_response_code(200);
       }
+
+      $stmt->close();
+      $con->close();
     }
     else {
       http_response_code(401);
@@ -222,22 +228,24 @@ switch($_SERVER['REQUEST_METHOD']) {
   case 'DELETE': 
     if(Utilities::is_jwt_valid($data->jwt, $secret)) {
       $employeeID = Utilities::uuid_to_bin($data->employeeID);
-      $sql = "DELETE FROM `employees` WHERE employeeID='$employeeID'";
 
-      // Run SQL statement
       $con = Database::get_database_connection();
-      $result = mysqli_query($con,$sql);
 
-      $con->close();
+      // Prepare and run SQL statement
+      $stmt = $con->prepare("DELETE FROM `employees` WHERE employeeID=?");
+      $stmt->bind_param("s", $employeeID);
 
       // Die if SQL statement failed
-      if (!$result) {
-        http_response_code(401);
+      if (!$stmt->execute()) {
+        http_response_code(404);
         die(mysqli_error($con));
       }
       else {
         http_response_code(200);
       }
+
+      $stmt->close();
+      $con->close();
     }
     else {
       http_response_code(401);
