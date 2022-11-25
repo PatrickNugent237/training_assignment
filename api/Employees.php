@@ -19,14 +19,14 @@ $data = json_decode(file_get_contents("php://input"));
 /// <param name="skillLevelID">The skill level ID</param>
 /// <returns>The skill name associated with the ID</returns>
 function determine_skill_Name($skillLevelID) {
-  if($skillLevelID == "7cb03b1e-5c57-11") {
-    return "Junior";
+  if($skillLevelID == "5aa7ba81-ecce-4143-84f1-2f70e9e247da") {
+    return "Senior";
   }
-  else if($skillLevelID == "8dc2281d-5c57-11") {
+  else if($skillLevelID == "c3551c4d-645b-4c47-8d30-ccbdcd4e2cfb") {
     return "Mid-level";
   }
   else {
-    return "Senior";
+    return "Junior";
   }  
 }
 
@@ -74,7 +74,7 @@ switch($_SERVER['REQUEST_METHOD']) {
 
       // Run SQL statement
       $con = Database::get_database_connection();
-      $result = mysqli_query($con ,$sql);
+      $result = mysqli_query($con, $sql);
 
       // Die if SQL statement failed
       if (!$result) {
@@ -93,19 +93,17 @@ switch($_SERVER['REQUEST_METHOD']) {
           // Go through all of the rows from the query result and extract the
           // data from each row into a json array.
           do {
-            $empId = $rows['EmployeeID'];
+            $empId = Utilities::bin_to_uuid($rows['EmployeeID']);
             $firstName = $rows['FirstName'];
             $lastName = $rows['LastName'];
             $dob = $rows['DOB'];
             $email = $rows['Email'];
-            $skillLevel = $rows['SkillLevelID'];
+            $skillLevel = Utilities::bin_to_uuid($rows['SkillLevelID']);
             $active = $rows['Active'];
             $age = $rows['Age'];
 
             $skillLevel = determine_skill_Name($skillLevel);
             $active = determine_active_status($active);
-
-            $empId = Utilities::bin_to_uuid($empId);
 
             $resultJson["data"][] = array('employeeID' => $empId, 
               'firstName' => $firstName, 'lastName' => $lastName, 'dob' 
@@ -157,6 +155,7 @@ switch($_SERVER['REQUEST_METHOD']) {
         mt_rand(0, 65535));
 
       $employeeBinID = Utilities::uuid_to_bin($employeeID);
+      $skillLevelBinID = Utilities::uuid_to_bin($skillLevelID);
 
       $con = Database::get_database_connection();
 
@@ -165,7 +164,7 @@ switch($_SERVER['REQUEST_METHOD']) {
         DOB, Email, SkillLevelID, Active, Age) 
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
       $stmt->bind_param("ssssssii", $employeeBinID, $firstName, $lastName, $dob, $email,
-        $skillLevelID, $active, $age);
+        $skillLevelBinID, $active, $age);
 
       if (!$stmt->execute()) {
         http_response_code(404);
@@ -195,6 +194,8 @@ switch($_SERVER['REQUEST_METHOD']) {
       $active = $data->active;
       $age = $data->age;
 
+      $skillLevelBinID = Utilities::uuid_to_bin($skillLevelID);
+
       // Calculate current age from date of birth and current date
       $currentDate = new DateTime("now");
       $birthDate = new DateTime($dob);
@@ -206,8 +207,8 @@ switch($_SERVER['REQUEST_METHOD']) {
       $stmt = $con->prepare("UPDATE `Employees` SET firstName=?, lastName=?,
         dob=?, email=?, skillLevelID=?, active=?,
         age=? WHERE employeeID=?");
-      $stmt->bind_param("sssssiis", $firstName, $lastName, $dob, $email, $skillLevelID,
-        $active, $age, $employeeID);
+      $stmt->bind_param("sssssiis", $firstName, $lastName, $dob, $email, 
+        $skillLevelBinID, $active, $age, $employeeID);
             
       if (!$stmt->execute()) {
         http_response_code(404);

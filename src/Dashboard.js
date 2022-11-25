@@ -162,7 +162,7 @@ const Dashboard = () => {
           <th>Employee ID</th>
           <th>First Name</th>
           <th>Last Name</th>
-          <th>Date of Birth</th>
+          <th>Date of Birth (y/m/d)</th>
           <th>Email</th>
           <th>Skill Level</th>
           <th>Active</th>

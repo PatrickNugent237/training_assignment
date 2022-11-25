@@ -97,13 +97,13 @@ export default function EmployeeForm({detailsToEdit}){
 
     // Determine the skill level ID to send from name
     if(employeeData.skillLevel === "Senior") {
-        skillLevelID = "995112f0-5c57-11";
+      skillLevelID = "5aa7ba81-ecce-4143-84f1-2f70e9e247da";
     }
     else if(employeeData.skillLevel === "Mid-level") {
-        skillLevelID = "8dc2281d-5c57-11";
+      skillLevelID = "c3551c4d-645b-4c47-8d30-ccbdcd4e2cfb";
     }
     else {
-        skillLevelID = "7cb03b1e-5c57-11";
+      skillLevelID = "af7d6466-6ca9-11ed-975e-e86a647b6868";
     }
 
     // Format active status as a number
@@ -135,7 +135,6 @@ export default function EmployeeForm({detailsToEdit}){
       }
     })
     .then(() => {
-      //console.log("mysqli error: " + data);
       navigate(0);
     })
     .catch((error) => {
